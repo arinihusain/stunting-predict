@@ -173,3 +173,9 @@ def summary():
         monthly_labels=monthly_labels,
         monthly_totals=monthly_totals
     )
+
+
+@main_bp.route('/tentang')
+@login_required
+def tentang():
+    return render_template("tentang.html")

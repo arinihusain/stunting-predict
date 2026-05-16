@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="min-h-screen bg-slate-50 flex">
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 bg-white border-r border-slate-200 min-h-screen sticky top-0 hidden lg:flex flex-col">
+
+        <!-- LOGO -->
+        <div class="px-8 py-8 border-b border-slate-100">
+
+            <div class="flex items-center gap-4">
+
+                <div class="w-14 h-14 rounded-2xl bg-indigo-100 flex items-center justify-center text-2xl">
+                    🩺
+                </div>
+
+                <div>
+
+                    <h1 class="text-xl font-bold text-slate-800 leading-tight">
+                        Sistem Prediksi
+                    </h1>
+
+                    <p class="text-slate-500 text-sm">
+                        Stunting Dashboard
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- PROFILE -->
+        <div class="px-8 py-6 border-b border-slate-100">
+
+            <p class="text-sm text-slate-400">
+                Login sebagai
+            </p>
+
+            <h3 class="font-semibold text-slate-800 mt-1">
+                {{ fullname }}
+            </h3>
+
+        </div>
+
+        <!-- NAVIGATION -->
+        <nav class="flex-1 px-5 py-6">
+
+            <p class="text-xs uppercase tracking-wider text-slate-400 px-3 mb-4">
+                Menu Utama
+            </p>
+
+            <div class="space-y-2">
+
+                <!-- DASHBOARD -->
+                <a
+                    href="/"
+                    class="flex items-center gap-4 px-4 py-4 rounded-2xl hover:bg-blue-50 hover:text-blue-600 transition group"
+
+                >
+
+                    <div class="w-10 h-10 rounded-xl hover:bg-blue-100 flex items-center justify-center text-lg">
+                        🏠
+                    </div>
+
+                    <div>
+                        <p class="font-medium">
+                            Dashboard
+                        </p>
+
+                        <p class="text-xs text-slate-400">
+                            Statistik Sistem
+                        </p>
+                    </div>
+
+                </a>
+
+                <!-- PREDIKSI -->
+                <a
+                    href="/prediksi"
+                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
+                >
+
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
+                        📈
+                    </div>
+
+                    <div>
+                        <p class="font-medium">
+                            Prediksi
+                        </p>
+
+                        <p class="text-xs text-slate-400">
+                            Prediksi Stunting
+                        </p>
+                    </div>
+
+                </a>
+
+                <!-- HISTORY -->
+                <a
+                    href="/history"
+                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition group"
+                >
+
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-lg transition">
+                        📋
+                    </div>
+
+                    <div>
+                        <p class="font-medium">
+                            Riwayat
+                        </p>
+
+                        <p class="text-xs text-slate-400">
+                            Riwayat Prediksi
+                        </p>
+                    </div>
+
+                </a>
+
+                <!-- TENTANG -->
+                <a
+                    href="/tentang"
+                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 bg-blue-100 text-blue-600 transition group"
+                >
+
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 bg-blue-100 flex items-center justify-center text-lg transition">
+                        📋
+                    </div>
+
+                    <div>
+                        <p class="font-medium text-blue-600">
+                            Tentang
+                        </p>
+
+                        <p class="text-xs text-slate-400">
+                            Tentang
+                        </p>
+                    </div>
+
+                </a>
+
+            </div>
+
+        </nav>
+
+        <!-- FOOTER -->
+        <div class="p-5 border-t border-slate-100">
+
+            <a
+                href="/logout"
+                class="flex items-center justify-center gap-3 w-full px-4 py-4 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition font-medium"
+            >
+                <span>🚪</span>
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1">
+
+        <!-- MOBILE HEADER -->
+        <div class="lg:hidden bg-white border-b border-slate-200 px-6 py-5">
+
+            <h1 class="text-2xl font-bold text-slate-800">
+                Ringkasan Prediksi
+            </h1>
+
+            <p class="text-slate-500 text-sm mt-1">
+                Selamat datang, {{ fullname }}
+            </p>
+
+        </div>
+
+        <!-- PAGE CONTENT -->
+        <div class="p-6 lg:p-10">
+
+            <!-- HERO -->
+            <div class="mb-10">
+
+                <div class="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-3xl p-8 text-white shadow-sm">
+
+                    <div class="flex items-center gap-5">
+
+                        <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-3xl">
+                            📈
+                        </div>
+
+                        <div>
+
+                            <h2 class="text-2xl font-bold">
+                                Statistik Prediksi Stunting
+                            </h2>
+
+                            <p class="text-indigo-100 mt-2 leading-relaxed">
+                                Ringkasan data prediksi digunakan untuk membantu
+                                monitoring kondisi pertumbuhan anak secara
+                                terstruktur dan real-time.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos laborum, ipsam a quasi eos impedit amet esse officiis laudantium sunt. Eveniet soluta exercitationem quisquam a. Eaque hic voluptatum vero delectus provident inventore reiciendis, esse ipsam quibusdam excepturi sint! Exercitationem, aliquid. Saepe asperiores voluptatum nihil nostrum repudiandae consequatur cupiditate ex iure, eos atque fugit ab provident quod incidunt ratione? Odio ea quam non corrupti velit enim, repellendus ex, dolore, eos quidem cum alias quo maxime nobis voluptas? Architecto, quas officiis tenetur, ducimus incidunt earum laudantium, repellat accusamus cupiditate est et. Quis itaque odio soluta? Aperiam quasi a deserunt veritatis, obcaecati eos expedita beatae! Reiciendis at nemo dolorum saepe provident in sint, incidunt dolore similique, nisi facere voluptate iure quas, non sed blanditiis ad magni totam perferendis accusamus maxime sapiente beatae ab dolorem? Illum, ratione. Maxime ullam at quibusdam voluptatem vel tenetur autem laboriosam quisquam ducimus ratione, voluptate asperiores ipsa ut alias quam dolore? Quas vitae architecto quod veritatis atque qui, porro deleniti harum magni, adipisci, incidunt laborum similique earum tenetur quisquam temporibus quaerat! Deserunt voluptates autem, voluptatum praesentium dolorum quasi perferendis cum aliquam, maiores pariatur quia, dolor nulla rem reiciendis. Et rem voluptates rerum, ut quo corrupti. Omnis soluta totam veniam.
+                </p>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+{% endblock %}
