@@ -178,4 +178,4 @@ def summary():
 @main_bp.route('/tentang')
 @login_required
 def tentang():
-    return render_template("tentang.html")
+    return render_template("tentang.html", fullname=session.get('fullname'))
