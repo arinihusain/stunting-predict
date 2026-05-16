@@ -1,0 +1,716 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="min-h-screen bg-slate-50 flex">
+
+    <!-- SIDEBAR -->
+    <aside class="w-72 bg-white border-r border-slate-200 min-h-screen sticky top-0 hidden lg:flex flex-col">
+
+        <!-- LOGO -->
+        <div class="px-8 py-8 border-b border-slate-100">
+
+            <div class="flex items-center gap-4">
+
+                <div class="w-14 h-14 rounded-2xl bg-indigo-100 flex items-center justify-center text-2xl">
+                    🩺
+                </div>
+
+                <div>
+
+                    <h1 class="text-xl font-bold text-slate-800 leading-tight">
+                        Sistem Prediksi
+                    </h1>
+
+                    <p class="text-slate-500 text-sm">
+                        Stunting Dashboard
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- PROFILE -->
+        <div class="px-8 py-6 border-b border-slate-100">
+
+            <p class="text-sm text-slate-400">
+                Login sebagai
+            </p>
+
+            <h3 class="font-semibold text-slate-800 mt-1">
+                {{ fullname }}
+            </h3>
+
+        </div>
+
+        <!-- NAVIGATION -->
+        <nav class="flex-1 px-5 py-6">
+
+            <p class="text-xs uppercase tracking-wider text-slate-400 px-3 mb-4">
+                Menu Utama
+            </p>
+
+            <div class="space-y-2">
+
+                <!-- DASHBOARD -->
+                <a
+                    href="/"
+                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition group"
+                >
+
+                    <div class="w-10 h-10 rounded-xl flex bg-slate-100 items-center justify-center text-lg">
+                        🏠
+                    </div>
+
+                    <div>
+                        <p class="font-semibold">
+                            Dashboard
+                        </p>
+
+                        <p class="text-xs text-indigo-400">
+                            Statistik Sistem
+                        </p>
+                    </div>
+
+                </a>
+
+                <!-- PREDIKSI -->
+                <a
+                    href="/prediksi"
+                    class="flex items-center gap-4 px-4 py-4 rounded-2xl bg-indigo-50 text-indigo-600 transition group"
+                >
+
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-lg">
+                        📈
+                    </div>
+
+                    <div>
+                        <p class="font-medium">
+                            Prediksi
+                        </p>
+
+                        <p class="text-xs text-slate-400">
+                            Prediksi Stunting
+                        </p>
+                    </div>
+
+                </a>
+
+                <!-- HISTORY -->
+                <a
+                    href="/history"
+                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition group"
+                >
+
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-lg transition">
+                        📋
+                    </div>
+
+                    <div>
+                        <p class="font-medium">
+                            Riwayat
+                        </p>
+
+                        <p class="text-xs text-slate-400">
+                            Riwayat Prediksi
+                        </p>
+                    </div>
+
+                </a>
+
+            </div>
+
+        </nav>
+
+        <!-- FOOTER -->
+        <div class="p-5 border-t border-slate-100">
+
+            <a
+                href="/logout"
+                class="flex items-center justify-center gap-3 w-full px-4 py-4 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition font-medium"
+            >
+                <span>🚪</span>
+                Logout
+            </a>
+
+        </div>
+
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1">
+
+        <!-- MOBILE HEADER -->
+        <div class="lg:hidden bg-white border-b border-slate-200 px-6 py-5">
+
+            <h1 class="text-2xl font-bold text-slate-800">
+                Sistem Prediksi Stunting
+            </h1>
+
+            <p class="text-slate-500 text-sm mt-1">
+                Selamat datang, {{ fullname }}
+            </p>
+
+        </div>
+
+        <!-- CONTENT -->
+        <div class="p-6 lg:p-10">
+
+            <!-- HERO -->
+            <div class="mb-10">
+
+                <div class="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-3xl p-8 text-white shadow-sm">
+
+                    <div class="max-w-3xl">
+
+                        <div class="flex items-center gap-4 mb-5">
+
+                            <div class="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-3xl">
+                                🩺
+                            </div>
+
+                            <div>
+
+                                <h2 class="text-2xl font-bold">
+                                    Deteksi Risiko Stunting Anak
+                                </h2>
+
+                                <p class="text-indigo-100 mt-1">
+                                    Berbasis Machine Learning Regresi Logistik
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <p class="text-indigo-100 leading-relaxed">
+                            Sistem membantu tenaga kesehatan melakukan skrining
+                            risiko stunting menggunakan data antropometri anak
+                            secara cepat, objektif, dan real-time.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- GRID -->
+            <div class="grid lg:grid-cols-5 gap-8">
+
+                <!-- FORM CARD -->
+                <div class="lg:col-span-3">
+
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
+
+                        <div class="mb-8">
+
+                            <h2 class="text-2xl font-bold text-slate-800">
+                                Input Data Antropometri
+                            </h2>
+
+                            <p class="text-slate-500 mt-2">
+                                Masukkan data pengukuran anak dengan lengkap.
+                            </p>
+
+                        </div>
+
+                        <form id="predictionForm" class="space-y-6">
+
+                            <!-- NAMA -->
+                            <div>
+
+                                <label class="block mb-2 text-sm font-medium text-slate-700">
+                                    Nama Anak
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="nama_anak"
+                                    placeholder="Masukkan nama anak"
+                                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
+                                >
+
+                            </div>
+
+                            <!-- JK -->
+                            <div>
+
+                                <label class="block mb-2 text-sm font-medium text-slate-700">
+                                    Jenis Kelamin
+                                </label>
+
+                                <select
+                                    name="jenis_kelamin"
+                                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
+                                >
+                                    <option value="0">
+                                        Perempuan
+                                    </option>
+
+                                    <option value="1">
+                                        Laki-laki
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                            <!-- GRID -->
+                            <div class="grid md:grid-cols-2 gap-5">
+
+                                <div>
+
+                                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                                        Berat Badan Lahir (kg)
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        name="bb_lahir"
+                                        placeholder="Contoh: 3.2"
+                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
+                                    >
+
+                                </div>
+
+                                <div>
+
+                                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                                        Umur (bulan)
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        name="umur"
+                                        placeholder="Contoh: 24"
+                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
+                                    >
+
+                                </div>
+
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-5">
+
+                                <div>
+
+                                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                                        Berat Badan (kg)
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        name="berat_badan"
+                                        placeholder="Contoh: 10.5"
+                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
+                                    >
+
+                                </div>
+
+                                <div>
+
+                                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                                        Tinggi Badan (cm)
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        name="tinggi_badan"
+                                        placeholder="Contoh: 84.5"
+                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
+                                    >
+
+                                </div>
+
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-5">
+
+                                <div>
+
+                                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                                        LILA (cm)
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        name="lila"
+                                        placeholder="Contoh: 14.8"
+                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
+                                    >
+
+                                </div>
+
+                                <div>
+
+                                    <label class="block mb-2 text-sm font-medium text-slate-700">
+                                        Tinggi Badan Ibu (cm)
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        step="0.1"
+                                        name="tb_ibu"
+                                        placeholder="Contoh: 155"
+                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
+                                    >
+
+                                </div>
+
+                            </div>
+
+                            <!-- BUTTON -->
+                            <button
+                                id="predictButton"
+                                type="submit"
+                                class="w-full bg-indigo-500 hover:bg-indigo-600 transition-all duration-300 text-white py-4 rounded-2xl font-semibold shadow-sm hover:shadow-md flex items-center justify-center gap-3"
+                            >
+                                <span id="buttonText">
+                                    Prediksi Risiko Stunting
+                                </span>
+
+                                <svg
+                                    id="buttonLoader"
+                                    class="hidden animate-spin h-5 w-5 text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        class="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        stroke-width="4"
+                                    ></circle>
+
+                                    <path
+                                        class="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                                    ></path>
+                                </svg>
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+                <!-- RESULT CARD -->
+                <div class="lg:col-span-2">
+
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8 sticky top-10">
+
+                        <div id="resultArea">
+
+                            <div class="text-center py-12">
+
+                                <div class="w-24 h-24 mx-auto rounded-3xl bg-slate-100 flex items-center justify-center text-5xl mb-6">
+                                    📊
+                                </div>
+
+                                <h2 class="text-2xl font-bold text-slate-800">
+                                    Hasil Prediksi
+                                </h2>
+
+                                <p class="text-slate-500 mt-3 leading-relaxed">
+                                    Hasil analisis risiko stunting akan muncul
+                                    setelah data antropometri diproses.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+
+const form = document.getElementById('predictionForm');
+
+const resultArea = document.getElementById('resultArea');
+
+const predictButton = document.getElementById('predictButton');
+
+const buttonText = document.getElementById('buttonText');
+
+const buttonLoader = document.getElementById('buttonLoader');
+
+form.addEventListener('submit', async (e) => {
+
+    e.preventDefault();
+
+    // =========================
+    // BUTTON LOADING
+    // =========================
+
+    predictButton.disabled = true;
+
+    predictButton.classList.add(
+        'opacity-70',
+        'cursor-not-allowed'
+    );
+
+    buttonText.innerText = 'Memproses Prediksi...';
+
+    buttonLoader.classList.remove('hidden');
+
+    // =========================
+    // LOADING RESULT CARD
+    // =========================
+
+    resultArea.innerHTML = `
+
+        <div class="flex flex-col items-center justify-center py-16">
+
+            <div class="relative mb-8">
+
+                <div class="w-24 h-24 rounded-full border-4 border-indigo-100"></div>
+
+                <div class="absolute inset-0 w-24 h-24 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
+
+            </div>
+
+            <h3 class="text-2xl font-bold text-slate-800 mb-3">
+                Sedang Menganalisis Data
+            </h3>
+
+            <p class="text-slate-500 text-center leading-relaxed max-w-sm">
+                Sistem machine learning sedang melakukan inferensi
+                terhadap data antropometri anak.
+            </p>
+
+        </div>
+
+    `;
+
+    try {
+
+        const formData = new FormData(form);
+
+        const response = await fetch('/predict', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if(data.success){
+
+            const prediction = data.result.prediction;
+
+            const probability = data.result.probability;
+
+            const zScore = data.result.z_score;
+
+            const zStatus = data.result.z_status;
+
+            let cardStyle = prediction === "Stunting"
+                ? "bg-amber-50 border-amber-100"
+                : "bg-blue-50 border-blue-100";
+
+            let badgeStyle = prediction === "Stunting"
+                ? "bg-amber-100 text-amber-700"
+                : "bg-blue-100 text-blue-700";
+
+            resultArea.innerHTML = `
+
+                <div class="rounded-3xl border p-8 ${cardStyle} animate-fadeIn">
+
+                    <div class="text-center">
+
+                        <!-- ICON -->
+                        <div class="text-7xl mb-6">
+                            ${prediction === "Stunting" ? "⚠️" : "✅"}
+                        </div>
+
+                        <!-- LABEL -->
+                        <div class="inline-flex items-center px-5 py-2 rounded-full ${badgeStyle} font-semibold mb-6">
+                            ${prediction}
+                        </div>
+
+                        <!-- MAIN RESULT -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+
+                            <!-- PROBABILITY -->
+                            <div class="bg-white/70 rounded-2xl p-5 border border-white/50">
+
+                                <p class="text-sm text-slate-500 mb-2">
+                                    Probabilitas Risiko
+                                </p>
+
+                                <h3 class="text-4xl font-bold text-slate-800">
+                                    ${probability}%
+                                </h3>
+
+                            </div>
+
+                            <!-- Z SCORE -->
+                            <div class="bg-white/70 rounded-2xl p-5 border border-white/50">
+
+                                <p class="text-sm text-slate-500 mb-2">
+                                    Z-Score
+                                </p>
+
+                                <h3 class="text-4xl font-bold text-slate-800">
+                                    ${zScore}
+                                </h3>
+
+                            </div>
+
+                        </div>
+
+                        <!-- STATUS -->
+                        <div class="bg-white/70 rounded-2xl p-5 text-left mb-5 border border-white/50">
+
+                            <div class="flex items-center justify-between mb-3">
+
+                                <h4 class="font-semibold text-slate-700">
+                                    Status Antropometri
+                                </h4>
+
+                                <span class="text-xl">
+                                    📋
+                                </span>
+
+                            </div>
+
+                            <p class="text-slate-600 leading-relaxed text-sm">
+                                ${zStatus}
+                            </p>
+
+                        </div>
+
+                        <!-- INTERPRETATION -->
+                        <div class="bg-white/70 rounded-2xl p-5 text-left border border-white/50">
+
+                            <div class="flex items-center justify-between mb-3">
+
+                                <h4 class="font-semibold text-slate-700">
+                                    Interpretasi Sistem
+                                </h4>
+
+                                <span class="text-xl">
+                                    🧠
+                                </span>
+
+                            </div>
+
+                            <p class="text-slate-600 leading-relaxed text-sm">
+
+                                ${
+                                    prediction === "Stunting"
+                                    ?
+                                    "Anak memiliki kecenderungan risiko stunting berdasarkan hasil inferensi machine learning dan evaluasi antropometri. Disarankan dilakukan pemeriksaan lanjutan oleh tenaga kesehatan."
+                                    :
+                                    "Data antropometri menunjukkan kondisi pertumbuhan anak masih berada dalam kategori normal berdasarkan hasil inferensi model."
+                                }
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        } else {
+
+            resultArea.innerHTML = `
+
+                <div class="rounded-3xl border border-red-100 bg-red-50 p-8">
+
+                    <div class="text-center">
+
+                        <div class="text-6xl mb-5">
+                            ❌
+                        </div>
+
+                        <h3 class="text-2xl font-bold text-red-700 mb-3">
+                            Prediksi Gagal
+                        </h3>
+
+                        <p class="text-red-600">
+                            Terjadi kesalahan saat memproses data.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+
+    } catch (error) {
+
+        resultArea.innerHTML = `
+
+            <div class="rounded-3xl border border-red-100 bg-red-50 p-8">
+
+                <div class="text-center">
+
+                    <div class="text-6xl mb-5">
+                        ⚠️
+                    </div>
+
+                    <h3 class="text-2xl font-bold text-red-700 mb-3">
+                        Koneksi Bermasalah
+                    </h3>
+
+                    <p class="text-red-600 leading-relaxed">
+                        Tidak dapat terhubung ke server prediksi.
+                    </p>
+
+                </div>
+
+            </div>
+
+        `;
+
+    } finally {
+
+        // =========================
+        // RESET BUTTON
+        // =========================
+
+        predictButton.disabled = false;
+
+        predictButton.classList.remove(
+            'opacity-70',
+            'cursor-not-allowed'
+        );
+
+        buttonText.innerText = 'Prediksi Risiko Stunting';
+
+        buttonLoader.classList.add('hidden');
+
+    }
+
+});
+
+</script>
+
+{% endblock %}
