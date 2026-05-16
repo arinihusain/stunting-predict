@@ -307,7 +307,10 @@
 
                                     <input
                                         type="number"
+                                        max="60"
+                                        min="0"
                                         name="umur"
+                                        oninput="this.value = Math.min(parseFloat(this.value) || 0, 60)"
                                         placeholder="Contoh: 24"
                                         class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
                                     >
@@ -599,27 +602,6 @@ form.addEventListener('submit', async (e) => {
                                 </h3>
 
                             </div>
-
-                        </div>
-
-                        <!-- STATUS -->
-                        <div class="bg-white/70 rounded-2xl p-5 text-left mb-5 border border-white/50">
-
-                            <div class="flex items-center justify-between mb-3">
-
-                                <h4 class="font-semibold text-slate-700">
-                                    Status Antropometri
-                                </h4>
-
-                                <span class="text-xl">
-                                    📋
-                                </span>
-
-                            </div>
-
-                            <p class="text-slate-600 leading-relaxed text-sm">
-                                ${zStatus}
-                            </p>
 
                         </div>
 

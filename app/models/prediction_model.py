@@ -22,3 +22,9 @@ class Prediction(db.Model):
         db.DateTime,
         default=datetime.utcnow
     )
+
+    def z_score(self):
+        median_tb = 49 + (self.umur * 1.5)
+        sd = 3.5
+        score = (self.tinggi_badan - median_tb) / sd
+        return round(score, 2)

@@ -5,6 +5,10 @@ from flask import (
     jsonify,
     session
 )
+from io import BytesIO
+from flask import send_file
+import openpyxl
+from openpyxl.styles import Font
 
 from datetime import datetime
 from sqlalchemy import extract, func
@@ -179,3 +183,115 @@ def summary():
 @login_required
 def tentang():
     return render_template("tentang.html", fullname=session.get('fullname'))
+
+
+# =========================================
+# DELETE HISTORY
+# =========================================
+@main_bp.route('/history/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_history(id):
+
+    history = Prediction.query.get_or_404(id)
+
+    try:
+        db.session.delete(history)
+        db.session.commit()
+
+        return jsonify({
+            "success": True,
+            "message": "Riwayat berhasil dihapus"
+        })
+    except:
+        return jsonify({
+            "success": False,
+            "message": "Riwayat gagal dihapus"
+        })
+    
+
+@main_bp.route('/history/export')
+@login_required
+def export_history():
+
+    histories = Prediction.query.order_by(
+        Prediction.created_at.desc()
+    ).all()
+
+    # Workbook
+    wb = openpyxl.Workbook()
+    ws = wb.active
+
+    ws.title = "Riwayat Prediksi"
+
+    # HEADER
+    headers = [
+        "ID",
+        "Nama Anak",
+        "Jenis Kelamin",
+        "BB Lahir",
+        "Umur",
+        "Berat Badan",
+        "Tinggi Badan",
+        "LILA",
+        "TB Ibu",
+        "Hasil Prediksi",
+        "Probabilitas (%)",
+        "Z-Score",
+        "Tanggal"
+    ]
+
+    ws.append(headers)
+
+    # STYLE HEADER
+    for cell in ws[1]:
+        cell.font = Font(bold=True)
+
+    # DATA
+    for item in histories:
+
+        gender = (
+            "Laki-laki"
+            if item.jenis_kelamin == 1
+            else "Perempuan"
+        )
+
+        ws.append([
+            item.id,
+            item.nama_anak,
+            gender,
+            item.bb_lahir,
+            item.umur,
+            item.berat_badan,
+            item.tinggi_badan,
+            item.lila,
+            item.tb_ibu,
+            item.prediction,
+            item.probability,
+            item.z_score(),
+            item.created_at.strftime('%d-%m-%Y %H:%M')
+        ])
+
+    # AUTO WIDTH
+    for column_cells in ws.columns:
+
+        length = max(
+            len(str(cell.value))
+            if cell.value else 0
+            for cell in column_cells
+        )
+
+        ws.column_dimensions[
+            column_cells[0].column_letter
+        ].width = length + 5
+
+    # SAVE MEMORY
+    output = BytesIO()
+    wb.save(output)
+    output.seek(0)
+
+    return send_file(
+        output,
+        as_attachment=True,
+        download_name="riwayat_prediksi_stunting.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )

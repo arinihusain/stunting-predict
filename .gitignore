@@ -2,3 +2,6 @@
 __pycache__/
 *.pyc
 venv/
+routers/__pycache__/main_routes.cpython-312.pyc
+models/__pycache__/prediction_model.cpython-312.pyc
+.gitignore

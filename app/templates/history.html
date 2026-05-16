@@ -1,6 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+
+@keyframes fadeIn {
+
+    from{
+        opacity:0;
+        transform:translateY(20px);
+    }
+
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+
+}
+
+</style>
 
 <div class="min-h-screen bg-slate-50 flex">
 
@@ -212,11 +229,31 @@
             </div>
 
             <!-- TABLE CARD -->
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="bg-white animate-[fadeIn_.25s_ease] rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
 
                 <!-- TOP -->
                 <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
+    
+                    <div class="flex items-center gap-3">
 
+                        <a
+                            href="/history/export"
+                            class="
+                                inline-flex items-center gap-3
+                                px-5 py-3
+                                rounded-2xl
+                                bg-emerald-50
+                                hover:bg-emerald-100
+                                text-emerald-600
+                                transition
+                                font-medium
+                            "
+                        >
+                            <span>📥</span>
+                            Export Excel
+                        </a>
+
+                </div>
                     <div>
 
                         <h3 class="text-xl font-bold text-slate-800">
@@ -239,29 +276,8 @@
                         <thead class="bg-slate-100 text-slate-700">
 
                             <tr>
-
                                 <th class="text-left px-6 py-4 font-semibold">
                                     Nama Anak
-                                </th>
-
-                                <th class="text-left px-6 py-4 font-semibold">
-                                    JK
-                                </th>
-
-                                <th class="text-left px-6 py-4 font-semibold">
-                                    Umur
-                                </th>
-
-                                <th class="text-left px-6 py-4 font-semibold">
-                                    BB
-                                </th>
-
-                                <th class="text-left px-6 py-4 font-semibold">
-                                    TB
-                                </th>
-
-                                <th class="text-left px-6 py-4 font-semibold">
-                                    LILA
                                 </th>
 
                                 <th class="text-left px-6 py-4 font-semibold">
@@ -273,7 +289,19 @@
                                 </th>
 
                                 <th class="text-left px-6 py-4 font-semibold">
+                                    Z-Score
+                                </th>
+
+                                <th class="text-left px-6 py-4 font-semibold">
                                     Tanggal
+                                </th>
+
+                                <th class="text-center px-6 py-4 font-semibold">
+                                    Detail
+                                </th>
+
+                                <th class="text-center px-6 py-4 font-semibold">
+                                    Aksi
                                 </th>
 
                             </tr>
@@ -303,37 +331,6 @@
 
                                         </div>
 
-                                    </td>
-
-                                    <!-- JK -->
-                                    <td class="px-6 py-5 text-slate-600">
-
-                                        {% if item.jenis_kelamin == 1 %}
-                                            Laki-laki
-                                        {% else %}
-                                            Perempuan
-                                        {% endif %}
-
-                                    </td>
-
-                                    <!-- UMUR -->
-                                    <td class="px-6 py-5 text-slate-600">
-                                        {{ item.umur }} bulan
-                                    </td>
-
-                                    <!-- BB -->
-                                    <td class="px-6 py-5 text-slate-600">
-                                        {{ item.berat_badan }} kg
-                                    </td>
-
-                                    <!-- TB -->
-                                    <td class="px-6 py-5 text-slate-600">
-                                        {{ item.tinggi_badan }} cm
-                                    </td>
-
-                                    <!-- LILA -->
-                                    <td class="px-6 py-5 text-slate-600">
-                                        {{ item.lila }} cm
                                     </td>
 
                                     <!-- HASIL -->
@@ -384,6 +381,24 @@
 
                                     </td>
 
+                                    <!-- Z SCORE -->
+                                    <td class="px-6 py-5">
+
+                                        <span class="
+                                            px-4 py-2 rounded-full text-sm font-semibold
+                                            {% if item.z_score() < -2 %}
+                                                bg-amber-100 text-amber-700
+                                            {% else %}
+                                                bg-blue-100 text-blue-700
+                                            {% endif %}
+                                        ">
+
+                                            {{ item.z_score() }}
+
+                                        </span>
+
+                                    </td>
+
                                     <!-- TANGGAL -->
                                     <td class="px-6 py-5 text-slate-500 text-sm">
 
@@ -394,6 +409,42 @@
                                         <div class="mt-1 text-slate-400">
                                             {{ item.created_at.strftime('%H:%M') }}
                                         </div>
+
+                                    </td>
+
+                                    <!-- DETAIL -->
+                                    <td class="px-6 py-5 text-center">
+
+                                        <button
+                                            onclick="openDetail(
+                                                '{{ item.nama_anak }}',
+                                                '{{ item.jenis_kelamin }}',
+                                                '{{ item.bb_lahir }}',
+                                                '{{ item.umur }}',
+                                                '{{ item.berat_badan }}',
+                                                '{{ item.tinggi_badan }}',
+                                                '{{ item.lila }}',
+                                                '{{ item.tb_ibu }}',
+                                                '{{ item.prediction }}',
+                                                '{{ item.probability }}',
+                                                '{{ item.z_score() }}'
+                                            )"
+                                            class="px-4 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 transition font-medium"
+                                        >
+                                            Detail
+                                        </button>
+
+                                    </td>
+
+                                    <!-- AKSI -->
+                                    <td class="px-6 py-5 text-center">
+
+                                        <button
+                                            onclick="deleteHistory({{ item.id }})"
+                                            class="w-11 h-11 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition flex items-center justify-center"
+                                        >
+                                            🗑️
+                                        </button>
 
                                     </td>
 
@@ -453,4 +504,201 @@
 
 </div>
 
+<!-- MODAL DETAIL -->
+<div
+    id="detailModal"
+    class="
+        fixed inset-0
+        bg-black/40
+        backdrop-blur-sm
+        hidden
+        items-center
+        justify-center
+        z-50
+        p-4
+        overflow-y-auto
+    "
+>
+
+    <div class="
+        bg-white
+        w-full
+        max-w-2xl
+        rounded-3xl
+        shadow-xl
+        max-h-[90vh]
+        overflow-y-auto
+        p-6 lg:p-8
+    ">
+        <!-- HEADER -->
+        <div class="
+            flex items-center justify-between
+            mb-8
+            sticky 
+            bg-white
+            pb-4
+            z-10
+        ">
+
+            <div>
+
+                <h2 class="text-2xl font-bold text-slate-800">
+                    Detail Prediksi
+                </h2>
+
+                <p class="text-slate-500 mt-1">
+                    Informasi lengkap data antropometri anak
+                </p>
+
+            </div>
+
+            <button
+                onclick="closeDetail()"
+                class="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 transition"
+            >
+                ✕
+            </button>
+
+        </div>
+
+        <!-- CONTENT -->
+        <div
+            id="detailContent"
+            class="grid md:grid-cols-2 gap-5"
+        >
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+function openDetail(
+    nama,
+    jk,
+    bb_lahir,
+    umur,
+    bb,
+    tb,
+    lila,
+    tb_ibu,
+    prediction,
+    probability,
+    zscore
+){
+
+    const modal = document.getElementById('detailModal');
+    const content = document.getElementById('detailContent');
+
+    const gender =
+        jk == 1
+        ? 'Laki-laki'
+        : 'Perempuan';
+
+    content.innerHTML = `
+
+        <div class="p-5 rounded-2xl bg-slate-50">
+            <p class="text-sm text-slate-400">Nama Anak</p>
+            <h3 class="font-semibold text-slate-800 mt-1">${nama}</h3>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-50">
+            <p class="text-sm text-slate-400">Jenis Kelamin</p>
+            <h3 class="font-semibold text-slate-800 mt-1">${gender}</h3>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-50">
+            <p class="text-sm text-slate-400">BB Lahir</p>
+            <h3 class="font-semibold text-slate-800 mt-1">${bb_lahir} kg</h3>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-50">
+            <p class="text-sm text-slate-400">Umur</p>
+            <h3 class="font-semibold text-slate-800 mt-1">${umur} bulan</h3>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-50">
+            <p class="text-sm text-slate-400">Berat Badan</p>
+            <h3 class="font-semibold text-slate-800 mt-1">${bb} kg</h3>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-50">
+            <p class="text-sm text-slate-400">Tinggi Badan</p>
+            <h3 class="font-semibold text-slate-800 mt-1">${tb} cm</h3>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-50">
+            <p class="text-sm text-slate-400">LILA</p>
+            <h3 class="font-semibold text-slate-800 mt-1">${lila} cm</h3>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-slate-50">
+            <p class="text-sm text-slate-400">TB Ibu</p>
+            <h3 class="font-semibold text-slate-800 mt-1">${tb_ibu} cm</h3>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-indigo-50 border border-indigo-100">
+            <p class="text-sm text-indigo-400">Hasil Prediksi</p>
+            <h3 class="font-bold text-indigo-700 mt-1">${prediction}</h3>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-blue-50 border border-blue-100">
+            <p class="text-sm text-blue-400">Probabilitas</p>
+            <h3 class="font-bold text-blue-700 mt-1">${probability}%</h3>
+        </div>
+
+        <div class="p-5 rounded-2xl bg-amber-50 border border-amber-100 md:col-span-2">
+            <p class="text-sm text-amber-400">Z-Score</p>
+            <h3 class="font-bold text-amber-700 mt-1">${zscore}</h3>
+        </div>
+
+    `;
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeDetail(){
+
+    const modal = document.getElementById('detailModal');
+
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+
+
+async function deleteHistory(id){
+
+    const confirmDelete = confirm(
+        "Yakin ingin menghapus riwayat prediksi ini?"
+    );
+
+    if(!confirmDelete) return;
+
+    try{
+
+        const response = await fetch(`/history/delete/${id}`, {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+
+        if(data.success){
+
+            location.reload();
+
+        }
+
+    }catch(error){
+
+        alert("Terjadi kesalahan saat menghapus data");
+
+    }
+
+}
+
+</script>
 {% endblock %}
