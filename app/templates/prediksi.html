@@ -605,6 +605,35 @@ form.addEventListener('submit', async (e) => {
 
                         </div>
 
+                        <div class="bg-white rounded-2xl p-6 text-left border border-slate-100 shadow-sm mb-4">
+                            <div class="flex items-center gap-3 mb-3">
+                                <span class="text-2xl">🥗</span>
+                                <h4 class="font-bold text-slate-800">Rekomendasi Gizi</h4>
+                            </div>
+
+                            <div class="text-slate-600 text-sm leading-relaxed">
+                                ${
+                                    prediction === "Stunting"
+                                    ? `
+                                    <ul class="list-disc pl-5 space-y-2 text-amber-900">
+                                        <li><b>Intervensi Protein Hewani:</b> Berikan telur, ikan, atau daging setiap hari untuk mendukung pertumbuhan tulang linear.</li>
+                                        <li><b>Konsultasi Medis:</b> Segera bawa anak ke Puskesmas atau dokter spesialis anak di Kabupaten Bulukumba untuk pemeriksaan klinis.</li>
+                                        <li><b>Pola Asuh:</b> Terapkan praktik pemberian makan yang responsif dan pastikan kebersihan lingkungan (sanitasi) terjaga.</li>
+                                    </ul>
+                                    `
+                                    : `
+                                    <ul class="list-disc pl-5 space-y-2 text-blue-900">
+                                        <li><b>Pertahankan Gizi:</b> Lanjutkan pola makan gizi seimbang sesuai panduan "Isi Piringku".</li>
+                                        <li><b>Pemantauan Rutin:</b> Tetap lakukan penimbangan dan pengukuran tinggi badan di Posyandu setiap bulan.</li>
+                                        <li><b>Stimulasi:</b> Berikan stimulasi psikososial sesuai kelompok umur untuk mendukung perkembangan kognitif.</li>
+                                    </ul>
+                                    `
+                                }
+                            </div>
+                        </div>
+
+
+                        
                         <!-- INTERPRETATION -->
                         <div class="bg-white/70 rounded-2xl p-5 text-left border border-white/50">
 

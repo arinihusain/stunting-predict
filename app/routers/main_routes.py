@@ -70,6 +70,26 @@ def predict():
         probability=result['probability']
     )
 
+    if result['prediction'] == 'Stunting':
+        saran = (
+            "Saran: Anak terindikasi stunting. Segera konsultasi ke tenaga kesehatan, "
+            "tingkatkan asupan protein hewani (telur/ikan), dan perbaiki pola asuh makan."
+        )
+    else:
+        saran = (
+            "Saran: Pertumbuhan anak normal. Pertahankan asupan gizi seimbang "
+            "dan rutin timbang berat badan di Posyandu setiap bulan."
+        )
+
+    result['rekomendasi'] = saran
+
+    history = Prediction(
+        user_id=session['user_id'],
+        nama_anak=form_data['nama_anak'],
+        prediction=result['prediction'],
+        probability=result['probability']
+    )
+
     try:
         db.session.add(history)
         db.session.commit()

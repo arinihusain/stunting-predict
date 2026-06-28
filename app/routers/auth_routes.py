@@ -50,7 +50,7 @@ def login():
         session["user_id"] = user.id
         session["fullname"] = user.fullname
 
-        return redirect(url_for("main.index"))
+        return redirect(url_for("main.summary"))
 
     return render_template("login.html")
 
