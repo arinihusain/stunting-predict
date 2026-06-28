@@ -83,13 +83,6 @@ def predict():
 
     result['rekomendasi'] = saran
 
-    history = Prediction(
-        user_id=session['user_id'],
-        nama_anak=form_data['nama_anak'],
-        prediction=result['prediction'],
-        probability=result['probability']
-    )
-
     try:
         db.session.add(history)
         db.session.commit()
