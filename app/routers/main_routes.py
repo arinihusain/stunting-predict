@@ -45,12 +45,12 @@ def predict():
         }), 400
 
     data = {
-        "jenis_kelamin": int(form_data["jenis_kelamin"]),
+        "JK": int(form_data["jenis_kelamin"]),
         "bb_lahir": float(form_data["bb_lahir"]),
-        "umur": float(form_data["umur"]),
-        "berat_badan": float(form_data["berat_badan"]),
-        "tinggi_badan": float(form_data["tinggi_badan"]),
-        "lila": float(form_data["lila"]),
+        "Usia": float(form_data["umur"]),
+        "Berat": float(form_data["berat_badan"]),
+        "Tinggi": float(form_data["tinggi_badan"]),
+        "LiLA": float(form_data["lila"]),
         "tb_ibu": float(form_data["tb_ibu"])
     }
 
@@ -59,12 +59,12 @@ def predict():
     history = Prediction(
         user_id=session['user_id'],
         nama_anak=form_data['nama_anak'],
-        jenis_kelamin=data['jenis_kelamin'],
+        jenis_kelamin=data['JK'],
         bb_lahir=data['bb_lahir'],
-        umur=data['umur'],
-        berat_badan=data['berat_badan'],
-        tinggi_badan=data['tinggi_badan'],
-        lila=data['lila'],
+        umur=data['Usia'],
+        berat_badan=data['Berat'],
+        tinggi_badan=data['Tinggi'],
+        lila=data['LiLA'],
         tb_ibu=data['tb_ibu'],
         prediction=result['prediction'],
         probability=result['probability']

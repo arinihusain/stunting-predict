@@ -63,14 +63,13 @@ def predict_stunting(data):
     # =========================
 
     features = np.array([[
-
-        data['jenis_kelamin'],
-        data['bb_lahir'],
-        data['umur'],
-        data['berat_badan'],
-        data['tinggi_badan'],
-        data['lila'],
-        data['tb_ibu']
+        data['JK'],
+        # data['BB_Lahir'],
+        data['Usia'],
+        data['Berat'],
+        data['Tinggi'],
+        data['LiLA'],
+        # data['TB_Ibu']
 
     ]])
 
@@ -95,8 +94,8 @@ def predict_stunting(data):
     # =========================
 
     z_score = calculate_z_score(
-        data['tinggi_badan'],
-        data['umur']
+        data['Tinggi'],
+        data['Usia']
     )
 
     z_status = interpret_z_score(z_score)

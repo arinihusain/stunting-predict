@@ -13,10 +13,10 @@ class Config:
 
     MODEL_PATH = os.path.join(
         BASE_DIR,
-        "app/models/model_stunting.pkl"
+        "app/models/model_stunting4.pkl"
     )
 
     SCALER_PATH = os.path.join(
         BASE_DIR,
-        "app/models/scaler.pkl"
+        "app/models/scaler4.pkl"
     )
