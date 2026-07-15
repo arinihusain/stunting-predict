@@ -53,6 +53,7 @@ def predict():
         "LiLA": float(form_data["lila"]),
         "tb_ibu": float(form_data["tb_ibu"])
     }
+    print("Data yang diterima:", data)  # Debugging line
 
     result = predict_stunting(data)
 
