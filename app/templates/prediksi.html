@@ -332,7 +332,6 @@
                                         max="60"
                                         min="0"
                                         name="umur"
-                                        oninput="this.value = Math.min(parseFloat(this.value) || 0, 60)"
                                         placeholder="Contoh: 24"
                                         class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
                                     
@@ -342,6 +341,7 @@
                                         "
 
                                         oninput="
+                                            this.value = Math.min(parseFloat(this.value) || 0, 60);
                                             this.classList.remove('border-red-500','ring-4','ring-red-100');
                                             this.setCustomValidity('');
                                         "                                        required
@@ -552,6 +552,14 @@ const predictButton = document.getElementById('predictButton');
 const buttonText = document.getElementById('buttonText');
 
 const buttonLoader = document.getElementById('buttonLoader');
+
+form.querySelectorAll("input").forEach(input => {
+    input.classList.remove(
+        "border-red-500",
+        "ring-4",
+        "ring-red-100"
+    );
+});
 
 form.addEventListener('submit', async (e) => {
 
@@ -945,6 +953,8 @@ lila.addEventListener("input",function(){
     }
 
 });
+
+
 
 </script>
 
