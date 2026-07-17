@@ -192,46 +192,123 @@
                     </div>
 
                     <div>
+
                         <h2 class="text-2xl font-bold mb-4">
-                            Tentang
+                            Tentang Sistem
                         </h2>
 
                         <p class="leading-relaxed">
-                            Stunting adalah kondisi gagal tumbuh pada anak akibat kekurangan gizi kronis dalam waktu lama, sehingga tinggi badan anak lebih rendah dibanding standar usianya. Stunting dapat memengaruhi perkembangan fisik, kecerdasan, dan kesehatan anak di masa depan.
+                            Sistem Prediksi Stunting merupakan aplikasi berbasis web yang dirancang
+                            untuk membantu tenaga kesehatan melakukan skrining awal risiko stunting
+                            pada anak usia <b>6–60 bulan</b>. Sistem menggunakan algoritma
+                            <b>Regresi Logistik</b> untuk menghasilkan prediksi berdasarkan data
+                            antropometri anak dan faktor maternal sehingga proses penilaian dapat
+                            dilakukan secara cepat sebagai pendukung pengambilan keputusan.
                         </p>
 
-                        <div class="mt-5">
+                        <!-- PARAMETER -->
+                        <div class="mt-6">
+
                             <h3 class="font-bold mb-2">
-                                Perbedaan Stunting Anak Laki-laki dan Perempuan
-                            </h3>
-
-                            <ul class="list-disc pl-5 space-y-2">
-                                <li>
-                                    <b>Anak laki-laki</b>
-                                    cenderung memiliki risiko stunting lebih tinggi karena kebutuhan energi dan pertumbuhan fisiknya lebih besar.
-                                </li>
-
-                                <li>
-                                    <b>Anak perempuan</b>
-                                    umumnya memiliki pertumbuhan lebih stabil, tetapi tetap berisiko mengalami stunting jika asupan gizi dan kesehatan tidak terpenuhi.
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="mt-5">
-                            <h3 class="font-bold mb-2">
-                                Penjabaran Skor Stunting (Z-Score TB/U)
+                                Parameter Prediksi
                             </h3>
 
                             <p class="mb-3">
-                                Penilaian stunting biasanya menggunakan skor tinggi badan menurut umur (TB/U):
+                                Sistem melakukan prediksi menggunakan beberapa parameter berikut:
                             </p>
 
                             <ul class="list-disc pl-5 space-y-2">
-                                <li><b>Normal:</b> ≥ -2 SD</li>
-                                <li><b>Stunting:</b> &lt; -2 SD sampai ≥ -3 SD</li>
-                                <li><b>Stunting Berat:</b> &lt; -3 SD</li>
+                                <li>Jenis Kelamin</li>
+                                <li>Berat Badan Lahir</li>
+                                <li>Umur</li>
+                                <li>Berat Badan</li>
+                                <li>Tinggi Badan</li>
+                                <li>Lingkar Lengan Atas (LILA)</li>
+                                <li>Tinggi Badan Ibu</li>
                             </ul>
+
+                        </div>
+
+                        <!-- HASIL -->
+                        <div class="mt-6">
+
+                            <h3 class="font-bold mb-2">
+                                Hasil Prediksi
+                            </h3>
+
+                            <p class="mb-3">
+                                Sistem menampilkan tiga informasi utama yang digunakan sebagai
+                                dasar skrining pertumbuhan anak.
+                            </p>
+
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><b>Hasil Prediksi</b> : Normal atau Stunting.</li>
+                                <li><b>Probabilitas</b> : Tingkat keyakinan model terhadap hasil prediksi.</li>
+                                <li><b>Z-Score (TB/U)</b> : Nilai tinggi badan menurut umur berdasarkan standar WHO.</li>
+                            </ul>
+
+                        </div>
+
+                        <!-- Z SCORE -->
+                        <div class="mt-6">
+
+                            <h3 class="font-bold mb-2">
+                                Interpretasi Z-Score (TB/U)
+                            </h3>
+
+                            <p class="mb-3">
+                                Z-Score merupakan indikator pertumbuhan anak berdasarkan standar
+                                WHO yang membandingkan tinggi badan menurut umur dan jenis kelamin.
+                            </p>
+
+                            <ul class="list-disc pl-5 space-y-2">
+                                <li><b>Normal</b> : ≥ -2 SD</li>
+                                <li><b>Stunting</b> : &lt; -2 SD sampai ≥ -3 SD</li>
+                                <li><b>Stunting Berat</b> : &lt; -3 SD</li>
+                            </ul>
+
+                        </div>
+
+                        <!-- GENDER -->
+                        <div class="mt-6">
+
+                            <h3 class="font-bold mb-2">
+                                Perbedaan Risiko Berdasarkan Jenis Kelamin
+                            </h3>
+
+                            <ul class="list-disc pl-5 space-y-2">
+
+                                <li>
+                                    <b>Anak laki-laki</b> memiliki kecenderungan risiko stunting
+                                    yang lebih tinggi karena kebutuhan energi dan laju
+                                    pertumbuhannya relatif lebih besar.
+                                </li>
+
+                                <li>
+                                    <b>Anak perempuan</b> umumnya memiliki pertumbuhan yang lebih
+                                    stabil, namun tetap berisiko mengalami stunting apabila
+                                    kebutuhan gizi dan kesehatannya tidak terpenuhi.
+                                </li>
+
+                            </ul>
+
+                        </div>
+
+                        <!-- CATATAN -->
+                        <div class="mt-6 p-5 rounded-2xl bg-white/15 border border-white/20">
+
+                            <h3 class="font-bold mb-2">
+                                Catatan
+                            </h3>
+
+                            <p class="leading-relaxed">
+                                Hasil prediksi yang diberikan sistem merupakan
+                                <b>alat bantu skrining awal</b> dan
+                                <b>bukan diagnosis medis</b>. Keputusan klinis tetap harus
+                                dilakukan oleh tenaga kesehatan melalui pemeriksaan lanjutan sesuai
+                                standar pelayanan kesehatan.
+                            </p>
+
                         </div>
 
                     </div>
@@ -246,6 +323,3 @@
     </main>
 
 </div>
-
-
-{% endblock %}
