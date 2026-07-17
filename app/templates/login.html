@@ -74,11 +74,40 @@
                         Password
                     </label>
 
+                    <div class="relative">
+
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            class="w-full rounded-2xl border border-slate-200 bg-slate-100 p-4 pr-12 focus:ring-4 focus:ring-indigo-100 outline-none"
+                        >
+
+                        <button
+                            type="button"
+                            id="togglePassword"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
+                        >
+                            👁️
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="flex items-center mt-4">
+
                     <input
-                        type="password"
-                        name="password"
-                        class="w-full rounded-2xl border border-slate-200 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
+                        type="checkbox"
+                        name="remember"
+                        class="rounded border-slate-300 text-indigo-600"
                     >
+
+                    <label class="ml-2 text-sm text-slate-600">
+
+                        Remember Me
+
+                    </label>
 
                 </div>
 
@@ -95,5 +124,27 @@
 
     </div>
 
+<script>
+
+const togglePassword=document.getElementById("togglePassword");
+const password=document.getElementById("password");
+
+togglePassword.onclick=()=>{
+
+    if(password.type==="password"){
+
+        password.type="text";
+        togglePassword.innerHTML="🙈";
+
+    }else{
+
+        password.type="password";
+        togglePassword.innerHTML="👁️";
+
+    }
+
+}
+
+</script>
 </body>
 </html>
