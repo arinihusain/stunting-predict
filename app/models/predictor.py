@@ -200,7 +200,6 @@ def predict_stunting(data):
         data['Usia'],
         data['Berat'],
         data['Tinggi'],
-        # data['LiLA'],
         data['tb_ibu']
 
     ]])

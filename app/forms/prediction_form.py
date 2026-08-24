@@ -10,7 +10,6 @@ class PredictionForm:
             'umur',
             'berat_badan',
             'tinggi_badan',
-            'lila',
             'tb_ibu'
         ]
 

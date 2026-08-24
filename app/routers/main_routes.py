@@ -50,7 +50,6 @@ def predict():
         "Usia": float(form_data["umur"]),
         "Berat": float(form_data["berat_badan"]),
         "Tinggi": float(form_data["tinggi_badan"]),
-        "LiLA": float(form_data["lila"]),
         "tb_ibu": float(form_data["tb_ibu"])
     }
     print("Data yang diterima:", data)  # Debugging line
@@ -65,7 +64,7 @@ def predict():
         umur=data['Usia'],
         berat_badan=data['Berat'],
         tinggi_badan=data['Tinggi'],
-        lila=data['LiLA'],
+        lila="",
         tb_ibu=data['tb_ibu'],
         prediction=result['prediction'],
         probability=result['probability']
@@ -246,7 +245,6 @@ def export_history():
         "Umur",
         "Berat Badan",
         "Tinggi Badan",
-        "LILA",
         "TB Ibu",
         "Hasil Prediksi",
         "Probabilitas (%)",
@@ -277,7 +275,6 @@ def export_history():
             item.umur,
             item.berat_badan,
             item.tinggi_badan,
-            item.lila,
             item.tb_ibu,
             item.prediction,
             item.probability,
