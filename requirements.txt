@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+SQLAlchemy
+Werkzeug
+numpy
+scikit-learn
+openpyxl
