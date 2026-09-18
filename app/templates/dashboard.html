@@ -1,558 +1,247 @@
 {% extends "base.html" %}
+{% from '_macros.html' import icon, card_head, stat, badge, progress_ring,
+         accordion_item, check_item, empty_state with context %}
+
+{% block title %}Dashboard — Sistem Prediksi Stunting{% endblock %}
 
 {% block content %}
 
-<div class="h-screen app-shell flex overflow-hidden">
+{% set has_data = total_predictions > 0 %}
+{% set peak = monthly_totals | max %}
+{% set daily_share = (daily_predictions / total_predictions * 100) | round(1) if has_data else 0 %}
 
-    <!-- SIDEBAR -->
-    <aside class="w-72 app-sidebar border-r border-slate-200 h-screen overflow-y-auto hidden lg:flex flex-col">
+<header class="mb-8">
+    <h1 class="text-display">Selamat datang, {{ fullname }}</h1>
+</header>
 
-        <div class="flex justify-end px-4 pt-3">
-            <button
-                type="button"
-                onclick="toggleTheme()"
-                aria-label="Ganti mode tampilan"
-                title="Ganti mode tampilan"
-                class="theme-toggle-btn w-8 h-8 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon theme-icon-moon"><use href="#icon-moon"></use></svg>
-                <svg class="ui-icon theme-icon-sun"><use href="#icon-sun"></use></svg>
-            </button>
-        </div>
+{# ---- Outcome composition + the headline counts ------------------------- #}
+<section class="flex flex-wrap items-end gap-x-12 gap-y-8 justify-between mb-10">
 
-        <!-- LOGO -->
-        <div class="px-8 pb-8 pt-2 border-b border-slate-100">
-
-            <div class="flex items-center gap-4">
-
-                <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl">
-                    <svg class="ui-icon"><use href="#icon-stethoscope"></use></svg>
-                </div>
-
-                <div>
-
-                    <h1 class="text-xl font-bold text-slate-800 leading-tight">
-                        Sistem Prediksi
-                    </h1>
-
-                    <p class="text-slate-500 text-sm">
-                        Stunting Dashboard
-                    </p>
-
-                </div>
-
+    <div class="flex-1 min-w-full sm:min-w-[20rem]">
+        {% if has_data %}
+            <div class="meter-head">
+                <span class="flex items-center gap-2"><span class="legend-dot legend-dot--ink"></span>Stunting {{ stunting_percentage }}%</span>
+                <span class="flex items-center gap-2">Normal {{ normal_percentage }}%<span class="legend-dot legend-dot--gold"></span></span>
             </div>
+        {% else %}
+            <div class="meter-head"><span>Belum ada data pemeriksaan</span></div>
+        {% endif %}
 
+        <div class="flex items-center gap-3">
+            <div class="stat-progress-pill-track meter--segmented flex-1"
+                 role="img"
+                 aria-label="{% if has_data %}Stunting {{ stunting_percentage }} persen, normal {{ normal_percentage }} persen{% else %}Belum ada data{% endif %}">
+                {% if has_data %}
+                    <div class="meter-seg meter-seg--ink" style="width: {{ stunting_percentage }}%"></div>
+                    <div class="meter-seg meter-seg--gold" style="width: {{ normal_percentage }}%"></div>
+                {% else %}
+                    <div class="meter-seg meter-seg--hatch"></div>
+                {% endif %}
+            </div>
+            {{ badge('+' ~ daily_predictions ~ ' hari ini', 'outline') }}
+        </div>
+    </div>
+
+    <div class="flex items-start gap-8 sm:gap-12">
+        {{ stat(total_predictions, 'Pemeriksaan', 'clipboard') }}
+        {{ stat(total_stunting, 'Stunting', 'warning') }}
+        {{ stat(total_normal, 'Normal', 'check-circle') }}
+    </div>
+</section>
+
+{# ---- Bento ------------------------------------------------------------- #}
+<div class="bento sm:grid-cols-2 xl:grid-cols-4">
+
+    {# 1. Latest examination -------------------------------------------- #}
+    <section class="card card--ink p-7 flex flex-col justify-between min-h-[19rem] overflow-hidden" style="--i: 0">
+        <div>
+            <span class="ghost-glyph">{{ icon('user') }}</span>
+            <p class="card-sub">Terakhir diperiksa</p>
         </div>
 
-        <!-- PROFILE -->
-        <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between gap-3">
-
+        {% if latest %}
             <div>
-                <p class="text-sm text-slate-400">
-                    Login sebagai
+                <p class="font-display text-2xl font-normal tracking-tight">{{ latest.nama_anak }}</p>
+                <p class="check-meta mt-1">
+                    {{ latest.umur | round | int }} bulan &middot;
+                    {{ 'Laki-laki' if latest.jenis_kelamin == 1 else 'Perempuan' }}
                 </p>
-
-                <h3 class="font-semibold text-slate-800 mt-1">
-                    {{ fullname }}
-                </h3>
+                <div class="flex items-center justify-between gap-3 mt-5">
+                    <span class="check-meta">{{ latest.created_at.strftime('%d %b, %H:%M') }}</span>
+                    {{ badge(latest.prediction, 'outline') }}
+                </div>
             </div>
-
-            <a
-                href="/logout"
-                aria-label="Logout"
-                title="Logout"
-                class="w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon"><use href="#icon-logout"></use></svg>
-            </a>
-
-        </div>
-
-        <!-- NAVIGATION -->
-        <nav class="flex-1 px-5 py-6">
-
-            <p class="text-xs uppercase tracking-wider text-slate-400 px-3 mb-4">
-                Menu Utama
-            </p>
-
-            <div class="space-y-2">
-
-                <!-- DASHBOARD -->
-                <a
-                    href="/"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl bg-indigo-50 text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-lg">
-                        <svg class="ui-icon"><use href="#icon-dashboard"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Dashboard
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Statistik Sistem
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- PREDIKSI -->
-                <a
-                    href="/prediksi"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-chart"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Prediksi
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Prediksi Stunting
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- HISTORY -->
-                <a
-                    href="/history"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-clipboard"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Riwayat
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Riwayat Prediksi
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- TENTANG -->
-                <a
-                    href="/tentang"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-info"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Tentang
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Tentang
-                        </p>
-                    </div>
-
-                </a>
-
-            </div>
-
-        </nav>
-
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="app-main flex-1 h-screen overflow-y-auto">
-
-        <!-- MOBILE HEADER -->
-        <div class="lg:hidden border-b border-slate-200 px-6 py-5 flex items-center justify-between gap-4">
-
+        {% else %}
             <div>
-                <h1 class="text-2xl font-bold text-slate-800">
-                    Ringkasan Prediksi
-                </h1>
-
-                <p class="text-slate-500 text-sm mt-1">
-                    Selamat datang, {{ fullname }}
-                </p>
+                <p class="font-display text-xl font-normal tracking-tight">Belum ada pemeriksaan</p>
+                <p class="check-meta mt-1 mb-5">Mulai dari satu anak.</p>
+                <a href="{{ url_for('main.index') }}" class="btn btn--primary btn--sm">Buat prediksi</a>
             </div>
+        {% endif %}
+    </section>
 
-            <button
-                type="button"
-                onclick="toggleTheme()"
-                aria-label="Ganti mode tampilan"
-                title="Ganti mode tampilan"
-                class="theme-toggle-btn w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon theme-icon-moon"><use href="#icon-moon"></use></svg>
-                <svg class="ui-icon theme-icon-sun"><use href="#icon-sun"></use></svg>
-            </button>
+    {# 2. Monthly chart -------------------------------------------------- #}
+    <section class="card card--white p-7 flex flex-col min-h-[19rem]" style="--i: 1">
+        {{ card_head('Grafik bulanan', action_href=url_for('main.history'),
+                     action_label='Buka riwayat lengkap') }}
 
+        <div class="flex items-baseline gap-3 mb-auto">
+            <span class="figure">{{ monthly_totals[active_month_index] }}</span>
+            <span class="label">Pemeriksaan<br>bulan ini</span>
         </div>
 
-        <!-- PAGE CONTENT -->
-        <div class="p-6 lg:p-10">
-
-            <!-- HERO -->
-            <div class="mb-10">
-
-                <div class="hero-panel rounded-3xl p-8 shadow-sm">
-
-                    <div class="flex items-center gap-5">
-
-                        <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-3xl">
-                            <svg class="ui-icon"><use href="#icon-chart"></use></svg>
-                        </div>
-
-                        <div>
-
-                            <h2 class="text-2xl font-bold">
-                                Statistik Prediksi Stunting
-                            </h2>
-
-                            <p class="text-white/80 mt-2 leading-relaxed">
-                                Ringkasan data prediksi digunakan untuk membantu
-                                monitoring kondisi pertumbuhan anak secara
-                                terstruktur dan real-time.
-                            </p>
-
-                        </div>
-
+        <div class="barchart mt-6" role="img"
+             aria-label="Jumlah pemeriksaan per bulan sepanjang tahun ini">
+            {% for total in monthly_totals %}
+                {% set active = loop.index0 == active_month_index %}
+                <div class="barchart-col">
+                    {% if active and total %}<span class="chart-tip">{{ total }}</span>{% endif %}
+                    <div class="barchart-track">
+                        <div class="barchart-bar {{ 'barchart-bar--active' if active else ('barchart-bar--filled' if total) }}"
+                             style="--h: {{ (total / peak * 100) | round if peak else 0 }}%;
+                                    animation-delay: {{ loop.index0 * 30 }}ms"></div>
                     </div>
-
+                    <span class="barchart-axis {{ 'is-active' if active }}">{{ monthly_labels[loop.index0][:1] }}</span>
                 </div>
+            {% endfor %}
+        </div>
+    </section>
 
+    {# 3. Stunting share ring ------------------------------------------- #}
+    <section class="card card--white p-7 flex flex-col min-h-[19rem]" style="--i: 2">
+        {{ card_head('Persentase stunting') }}
+
+        <div class="flex-1 flex items-center justify-center">
+            {{ progress_ring(stunting_percentage, stunting_percentage ~ '%', 'dari total') }}
+        </div>
+
+        <div class="flex items-center justify-between gap-2 mt-6">
+            <div class="flex gap-2">
+                {{ badge(total_stunting ~ ' stunting', 'outline', size='sm') }}
+                {{ badge(total_normal ~ ' normal', 'outline', size='sm') }}
             </div>
+            <a href="{{ url_for('main.index') }}" class="btn btn--dark btn--round"
+               aria-label="Buat prediksi baru">{{ icon('stethoscope') }}</a>
+        </div>
+    </section>
 
-            <!-- STATISTICS -->
-            <div class="grid md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
+    {# 4. Summary bars --------------------------------------------------- #}
+    <section class="card card--cream p-7 flex flex-col min-h-[19rem]" style="--i: 3">
+        <div class="card-head">
+            <h3 class="card-title">Ringkasan</h3>
+            <span class="figure">{{ stunting_percentage }}%</span>
+        </div>
 
-                <!-- TOTAL -->
-                <div class="surface-card bg-white rounded-3xl p-6 border border-slate-100">
-
-                    <div class="flex items-center justify-between mb-5">
-
-                        <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl">
-                            <svg class="ui-icon"><use href="#icon-chart"></use></svg>
-                        </div>
-
-                    </div>
-
-                    <p class="text-slate-500 text-sm">
-                        Total Prediksi
-                    </p>
-
-                    <h3 class="text-4xl font-bold text-slate-800 mt-2">
-                        {{ total_predictions }}
-                    </h3>
-
-                </div>
-
-                <!-- STUNTING -->
-                <div class="surface-card bg-white rounded-3xl p-6 border border-slate-100">
-
-                    <div class="flex items-center justify-between mb-5">
-
-                        <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl">
-                            <svg class="ui-icon"><use href="#icon-warning"></use></svg>
-                        </div>
-
-                    </div>
-
-                    <p class="text-slate-500 text-sm">
-                        Total Stunting
-                    </p>
-
-                    <h3 class="text-4xl font-bold text-slate-800 mt-2">
-                        {{ total_stunting }}
-                    </h3>
-
-                </div>
-
-                <!-- NORMAL -->
-                <div class="surface-card bg-white rounded-3xl p-6 border border-slate-100">
-
-                    <div class="flex items-center justify-between mb-5">
-
-                        <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl">
-                            <svg class="ui-icon"><use href="#icon-check"></use></svg>
-                        </div>
-
-                    </div>
-
-                    <p class="text-slate-500 text-sm">
-                        Tidak Stunting
-                    </p>
-
-                    <h3 class="text-4xl font-bold text-slate-800 mt-2">
-                        {{ total_normal }}
-                    </h3>
-
-                </div>
-
-                <!-- DAILY -->
-                <div class="surface-card bg-white rounded-3xl p-6 border border-slate-100">
-
-                    <div class="flex items-center justify-between mb-5">
-
-                        <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl">
-                            <svg class="ui-icon"><use href="#icon-calendar"></use></svg>
-                        </div>
-
-                    </div>
-
-                    <p class="text-slate-500 text-sm">
-                        Prediksi Hari Ini
-                    </p>
-
-                    <h3 class="text-4xl font-bold text-slate-800 mt-2">
-                        {{ daily_predictions }}
-                    </h3>
-
-                </div>
-
-            </div>
-
-            <!-- CHART SECTION -->
-            <div class="grid xl:grid-cols-3 gap-8">
-
-                <!-- GRAPH -->
-                <div class="xl:col-span-2">
-
-                    <div class="surface-card bg-white rounded-3xl p-8">
-
-                        <div class="mb-8">
-
-                            <h3 class="text-2xl font-bold text-slate-800">
-                                Grafik Prediksi Bulanan
-                            </h3>
-
-                            <p class="text-slate-500 mt-2">
-                                Visualisasi jumlah prediksi stunting setiap bulan.
-                            </p>
-
-                        </div>
-
-                        <canvas id="monthlyChart" height="120"></canvas>
-
-                    </div>
-
-                </div>
-
-                <!-- SUMMARY CARD -->
+        <div class="space-y-5 mt-auto">
+            {% for name, pct, tone in [
+                ('Stunting', stunting_percentage, 'gold'),
+                ('Normal', normal_percentage, 'ink'),
+                ('Hari ini', daily_share, 'neutral')
+            ] %}
                 <div>
-
-                    <div class="surface-card bg-white rounded-3xl p-8">
-
-                        <div class="mb-6">
-
-                            <h3 class="text-2xl font-bold text-slate-800">
-                                Ringkasan Sistem
-                            </h3>
-
-                            <p class="text-slate-500 mt-2">
-                                Statistik umum penggunaan sistem prediksi.
-                            </p>
-
-                        </div>
-
-                        <div class="space-y-5">
-
-                            <div class="flex items-center justify-between p-5 rounded-2xl bg-slate-50">
-
-                                <div>
-
-                                    <p class="text-slate-500 text-sm">
-                                        Persentase Stunting
-                                    </p>
-
-                                    <h4 class="text-2xl font-bold text-slate-800 mt-1">
-                                        {{ stunting_percentage }}%
-                                    </h4>
-
-                                </div>
-
-                                <div class="text-3xl text-amber-500">
-                                    <svg class="ui-icon"><use href="#icon-warning"></use></svg>
-                                </div>
-
-                            </div>
-
-                            <div class="flex items-center justify-between p-5 rounded-2xl bg-slate-50">
-
-                                <div>
-
-                                    <p class="text-slate-500 text-sm">
-                                        Persentase Normal
-                                    </p>
-
-                                    <h4 class="text-2xl font-bold text-slate-800 mt-1">
-                                        {{ normal_percentage }}%
-                                    </h4>
-
-                                </div>
-
-                                <div class="text-3xl text-emerald-500">
-                                    <svg class="ui-icon"><use href="#icon-check"></use></svg>
-                                </div>
-
-                            </div>
-
-                            <div class="p-5 rounded-2xl bg-indigo-50 border border-indigo-100">
-
-                                <h4 class="font-semibold text-indigo-700 mb-3 flex items-center gap-2">
-                                    <svg class="ui-icon"><use href="#icon-info"></use></svg>
-                                    Informasi Sistem
-                                </h4>
-
-                                <p class="text-indigo-600 leading-relaxed text-sm">
-                                    Dashboard membantu tenaga kesehatan memantau
-                                    hasil skrining stunting secara cepat,
-                                    terstruktur, dan berbasis data real-time.
-                                </p>
-
-                            </div>
-
-                        </div>
-
+                    <div class="meter-head">
+                        <span>{{ name }}</span>
+                        <span class="meter-value">{{ pct }}%</span>
                     </div>
-
+                    <div class="stat-progress-pill-track meter--segmented meter--tall">
+                        {# A zero segment is omitted entirely: the hatched track is
+                           the "nothing here" signal, and a minimum-width stub at 0%
+                           would read as a real value. #}
+                        {% if pct %}
+                            <div class="meter-seg meter-seg--{{ tone }}" style="width: {{ pct }}%"></div>
+                        {% endif %}
+                        <div class="meter-seg meter-seg--hatch"></div>
+                    </div>
                 </div>
+            {% endfor %}
+        </div>
+    </section>
 
-            </div>
+    {# 5. About accordion ------------------------------------------------ #}
+    <section class="card card--white p-7" style="--i: 4">
+        <h3 class="card-title mb-2">Tentang sistem</h3>
 
+        <div class="accordion">
+            {% call accordion_item('Parameter prediksi') %}
+                Jenis kelamin, berat badan lahir, umur, berat badan, tinggi badan, dan
+                tinggi badan ibu.
+            {% endcall %}
+            {% call accordion_item('Interpretasi Z-Score') %}
+                Normal &ge; &minus;2 SD, stunting &minus;3 s.d. &minus;2 SD, stunting berat
+                &lt; &minus;3 SD.
+            {% endcall %}
+            {% call accordion_item('Hasil prediksi') %}
+                Label Normal atau Stunting, probabilitas model, dan Z-Score TB/U.
+            {% endcall %}
+            {% call accordion_item('Catatan') %}
+                Alat bantu skrining awal, bukan diagnosis medis.
+            {% endcall %}
         </div>
 
-    </main>
+        <a href="{{ url_for('main.tentang') }}" class="btn btn--ghost btn--sm btn--block mt-5">
+            Baca selengkapnya
+        </a>
+    </section>
+
+    {# 6. Seven-day activity --------------------------------------------- #}
+    <section class="card card--white p-7 sm:col-span-2" style="--i: 5">
+        <div class="flex items-center justify-between gap-3 mb-6">
+            <span class="month-tab">{{ prev_month_label }}</span>
+            <span class="month-tab month-tab--current">{{ month_label }}</span>
+            <span class="month-tab month-tab--edge">{{ next_month_label }}</span>
+        </div>
+
+        {% if week_total %}
+            <div class="timeline-grid">
+                {% for day in week_days %}
+                    <div class="timeline-daylabel {{ 'is-today' if day.is_today }}">
+                        <p class="timeline-dayname">{{ day.name }}</p>
+                        <p class="timeline-daynum">{{ day.num }}</p>
+                    </div>
+                {% endfor %}
+
+                {% for day in week_days %}
+                    <div class="timeline-col">
+                        {% for item in day['items'] %}
+                            <div class="timeline-chip {{ 'timeline-chip--risk' if item.prediction == 'Stunting' else 'timeline-chip--safe' }}">
+                                <p class="timeline-chip-name">{{ item.nama_anak }}</p>
+                                <p class="timeline-chip-time">{{ item.created_at.strftime('%H:%M') }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            {{ empty_state('calendar', 'Minggu ini masih kosong',
+                           'Pemeriksaan yang kamu simpan akan muncul di kolom harinya.',
+                           'Buat prediksi', url_for('main.index')) }}
+        {% endif %}
+    </section>
+
+    {# 7. Recent examinations -------------------------------------------- #}
+    <section class="card-peek" style="--i: 6">
+        <div class="card card--ink p-7 h-full">
+            <div class="card-head">
+                <h3 class="card-title">Pemeriksaan terbaru</h3>
+                <span class="figure">{{ recent_predictions | length }}/5</span>
+            </div>
+
+            {% if recent_predictions %}
+                <div class="checklist">
+                    {% for item in recent_predictions %}
+                        {{ check_item(
+                            item.nama_anak,
+                            item.created_at.strftime('%d %b, %H:%M'),
+                            'nutrition' if item.prediction == 'Normal' else 'warning',
+                            'done' if item.prediction == 'Normal' else 'risk'
+                        ) }}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="check-meta mt-4">Belum ada pemeriksaan tersimpan.</p>
+            {% endif %}
+        </div>
+    </section>
 
 </div>
-
-<!-- CHART JS -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-
-const ctx = document.getElementById('monthlyChart');
-
-function getChartColors() {
-    const dark = document.documentElement.classList.contains('dark');
-    return {
-        text: dark ? '#9fb0ab' : '#526770',
-        tooltipBg: dark ? '#16231f' : '#18343b',
-        grid: dark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(24, 52, 59, 0.06)'
-    };
-}
-
-const chartColors = getChartColors();
-
-const monthlyChart = new Chart(ctx, {
-
-    type: 'line',
-
-    data: {
-
-        labels: {{ monthly_labels | tojson }},
-
-        datasets: [
-
-            {
-                label: 'Prediksi Bulanan',
-                data: {{ monthly_totals | tojson }},
-                borderColor: '#0f766e',
-                backgroundColor: 'rgba(15, 118, 110, 0.1)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 3,
-                pointRadius: 5,
-                pointBackgroundColor: '#0f766e',
-                pointHoverRadius: 6
-            }
-
-        ]
-
-    },
-
-    options: {
-
-        responsive: true,
-
-        maintainAspectRatio: true,
-
-        plugins: {
-
-            legend: {
-                display: true,
-                labels: {
-                    font: {
-                        family: "'Inter', sans-serif",
-                        size: 13
-                    },
-                    color: chartColors.text,
-                    usePointStyle: true,
-                    boxWidth: 8
-                }
-            },
-
-            tooltip: {
-                backgroundColor: chartColors.tooltipBg,
-                titleFont: { family: "'Plus Jakarta Sans', sans-serif", weight: 'bold' },
-                bodyFont: { family: "'Inter', sans-serif" },
-                padding: 12,
-                cornerRadius: 10,
-                displayColors: false
-            }
-
-        },
-
-        scales: {
-
-            x: {
-                grid: { display: false },
-                border: { display: false },
-                ticks: {
-                    color: chartColors.text,
-                    font: { family: "'Inter', sans-serif", size: 12 }
-                }
-            },
-
-            y: {
-                beginAtZero: true,
-                grid: { color: chartColors.grid },
-                border: { display: false },
-                ticks: {
-                    precision: 0,
-                    color: chartColors.text,
-                    font: { family: "'Inter', sans-serif", size: 12 }
-                }
-            }
-
-        }
-
-    }
-
-});
-
-document.addEventListener('themechange', function () {
-    const c = getChartColors();
-    monthlyChart.options.plugins.legend.labels.color = c.text;
-    monthlyChart.options.plugins.tooltip.backgroundColor = c.tooltipBg;
-    monthlyChart.options.scales.x.ticks.color = c.text;
-    monthlyChart.options.scales.y.ticks.color = c.text;
-    monthlyChart.options.scales.y.grid.color = c.grid;
-    monthlyChart.update();
-});
-
-</script>
-
 {% endblock %}

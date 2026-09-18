@@ -1,794 +1,141 @@
 {% extends "base.html" %}
+{% from '_macros.html' import icon, badge, pill_progress, empty_state with context %}
+
+{% block title %}Riwayat — Sistem Prediksi Stunting{% endblock %}
 
 {% block content %}
-<style>
 
-@keyframes fadeIn {
-
-    from{
-        opacity:0;
-        transform:translateY(20px);
-    }
-
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
-
-}
-
-</style>
-
-<div class="h-screen app-shell flex overflow-hidden">
-
-    <!-- SIDEBAR -->
-    <aside class="w-72 app-sidebar border-r border-slate-200 h-screen overflow-y-auto hidden lg:flex flex-col">
-
-        <div class="flex justify-end px-4 pt-3">
-            <button
-                type="button"
-                onclick="toggleTheme()"
-                aria-label="Ganti mode tampilan"
-                title="Ganti mode tampilan"
-                class="theme-toggle-btn w-8 h-8 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon theme-icon-moon"><use href="#icon-moon"></use></svg>
-                <svg class="ui-icon theme-icon-sun"><use href="#icon-sun"></use></svg>
-            </button>
-        </div>
-
-        <!-- LOGO -->
-        <div class="px-8 pb-8 pt-2 border-b border-slate-100">
-
-            <div class="flex items-center gap-4">
-
-                <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl">
-                    <svg class="ui-icon"><use href="#icon-stethoscope"></use></svg>
-                </div>
-
-                <div>
-
-                    <h1 class="text-xl font-bold text-slate-800 leading-tight">
-                        Sistem Prediksi
-                    </h1>
-
-                    <p class="text-slate-500 text-sm">
-                        Stunting Dashboard
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <!-- PROFILE -->
-        <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between gap-3">
-
-            <div>
-                <p class="text-sm text-slate-400">
-                    Login sebagai
-                </p>
-
-                <h3 class="font-semibold text-slate-800 mt-1">
-                    {{ fullname }}
-                </h3>
-            </div>
-
-            <a
-                href="/logout"
-                aria-label="Logout"
-                title="Logout"
-                class="w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon"><use href="#icon-logout"></use></svg>
-            </a>
-
-        </div>
-
-        <!-- NAVIGATION -->
-        <nav class="flex-1 px-5 py-6">
-
-            <p class="text-xs uppercase tracking-wider text-slate-400 px-3 mb-4">
-                Menu Utama
-            </p>
-
-            <div class="space-y-2">
-
-                <!-- DASHBOARD -->
-                <a
-                    href="/"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-dashboard"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Dashboard
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Statistik Sistem
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- PREDIKSI -->
-                <a
-                    href="/prediksi"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-chart"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Prediksi
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Prediksi Stunting
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- HISTORY -->
-                <a
-                    href="/history"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl bg-indigo-50 text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-lg">
-                        <svg class="ui-icon"><use href="#icon-clipboard"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-semibold">
-                            Riwayat
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Riwayat Prediksi
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- TENTANG -->
-                <a
-                    href="/tentang"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-info"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Tentang
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Tentang
-                        </p>
-                    </div>
-
-                </a>
-
-            </div>
-
-        </nav>
-
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="app-main flex-1 h-screen overflow-y-auto">
-
-        <!-- MOBILE HEADER -->
-        <div class="lg:hidden bg-white border-b border-slate-200 px-6 py-5 flex items-center justify-between gap-4">
-
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">
-                    Riwayat Prediksi
-                </h1>
-
-                <p class="text-slate-500 text-sm mt-1">
-                    Selamat datang, {{ fullname }}
-                </p>
-            </div>
-
-            <button
-                type="button"
-                onclick="toggleTheme()"
-                aria-label="Ganti mode tampilan"
-                title="Ganti mode tampilan"
-                class="theme-toggle-btn w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon theme-icon-moon"><use href="#icon-moon"></use></svg>
-                <svg class="ui-icon theme-icon-sun"><use href="#icon-sun"></use></svg>
-            </button>
-
-        </div>
-
-        <!-- CONTENT -->
-        <div class="p-6 lg:p-10">
-
-            <!-- HERO -->
-            <div class="mb-8">
-
-                <div class="hero-panel rounded-3xl p-8 shadow-sm">
-
-                    <div class="flex items-center gap-5">
-
-                        <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-3xl">
-                            <svg class="ui-icon"><use href="#icon-clipboard"></use></svg>
-                        </div>
-
-                        <div>
-
-                            <h2 class="text-2xl font-bold">
-                                Data Riwayat Prediksi
-                            </h2>
-
-                            <p class="text-white/80 mt-2 leading-relaxed">
-                                Sistem menyimpan seluruh hasil prediksi risiko
-                                stunting untuk membantu tenaga kesehatan melakukan
-                                monitoring dan evaluasi data anak.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- TABLE CARD -->
-            <div class="surface-card bg-white animate-[fadeIn_.25s_ease] rounded-3xl overflow-hidden">
-
-                <!-- TOP -->
-                <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
-
-                    <div class="flex items-center gap-3">
-
-                        <a
-                            href="/history/export"
-                            class="
-                                inline-flex items-center gap-3
-                                px-5 py-3
-                                rounded-2xl
-                                bg-emerald-50
-                                hover:bg-emerald-100
-                                text-emerald-600
-                                transition
-                                font-medium
-                            "
-                        >
-                            <svg class="ui-icon"><use href="#icon-download"></use></svg>
-                            Export Excel
-                        </a>
-
-                </div>
-                    <div>
-
-                        <h3 class="text-xl font-bold text-slate-800">
-                            Riwayat Pemeriksaan
-                        </h3>
-
-                        <p class="text-slate-500 text-sm mt-1">
-                            Total data: {{ histories|length }} prediksi
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <!-- TABLE -->
-                <div class="overflow-x-auto">
-
-                    <table class="w-full min-w-[900px]">
-
-                        <thead class="bg-slate-50 text-slate-700">
-
-                            <tr>
-                                <th class="text-left px-6 py-4 font-semibold">
-                                    Nama Anak
-                                </th>
-
-                                <th class="text-left px-6 py-4 font-semibold">
-                                    Hasil
-                                </th>
-
-                                <th class="text-left px-6 py-4 font-semibold">
-                                    Risiko
-                                </th>
-
-                                <th class="text-left px-6 py-4 font-semibold">
-                                    Z-Score
-                                </th>
-
-                                <th class="text-left px-6 py-4 font-semibold">
-                                    Tanggal
-                                </th>
-
-                                <th class="text-center px-6 py-4 font-semibold">
-                                    Detail
-                                </th>
-
-                                <th class="text-center px-6 py-4 font-semibold">
-                                    Aksi
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            {% if histories %}
-
-                                {% for item in histories %}
-
-                                <tr class="border-t border-slate-100 hover:bg-slate-50 transition">
-
-                                    <!-- NAMA -->
-                                    <td class="px-6 py-5">
-
-                                        <div>
-
-                                            <p class="font-semibold text-slate-800">
-                                                {{ item.nama_anak }}
-                                            </p>
-
-                                            <p class="text-sm text-slate-400 mt-1">
-                                                ID #{{ item.id }}
-                                            </p>
-
-                                        </div>
-
-                                    </td>
-
-                                    <!-- HASIL -->
-                                    <td class="px-6 py-5">
-
-                                        {% if item.prediction == 'Stunting' %}
-
-                                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 text-amber-700 text-sm font-semibold">
-                                            <svg class="ui-icon"><use href="#icon-warning"></use></svg>
-                                            Stunting
-                                        </span>
-
-                                        {% else %}
-
-                                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold">
-                                            <svg class="ui-icon"><use href="#icon-check"></use></svg>
-                                            Normal
-                                        </span>
-
-                                        {% endif %}
-
-                                    </td>
-
-                                    <!-- RISIKO -->
-                                    <td class="px-6 py-5">
-
-                                        <div class="flex items-center gap-3">
-
-                                            <div class="w-24 bg-slate-100 rounded-full h-3 overflow-hidden">
-
-                                                <div
-                                                    class="
-                                                        h-3 rounded-full
-                                                        {% if item.prediction == 'Stunting' %}
-                                                            bg-amber-400
-                                                        {% else %}
-                                                            bg-emerald-400
-                                                        {% endif %}
-                                                    "
-                                                    style="width: {{ item.probability }}%"
-                                                ></div>
-
-                                            </div>
-
-                                            <span class="font-semibold text-slate-700">
-                                                {{ item.probability }}%
-                                            </span>
-
-                                        </div>
-
-                                    </td>
-
-                                    <!-- Z SCORE -->
-                                    <td class="px-6 py-5">
-
-                                        <span class="
-                                            px-4 py-2 rounded-full text-sm font-semibold
-                                            {% if item.z_score() < -2 %}
-                                                bg-amber-100 text-amber-700
-                                            {% else %}
-                                                bg-blue-100 text-blue-700
-                                            {% endif %}
-                                        ">
-
-                                            {{ item.z_score() }}
-
-                                        </span>
-
-                                    </td>
-
-                                    <!-- TANGGAL -->
-                                    <td class="px-6 py-5 text-slate-500 text-sm">
-
-                                        <div>
-                                            {{ item.created_at.strftime('%d %B %Y') }}
-                                        </div>
-
-                                        <div class="mt-1 text-slate-400">
-                                            {{ item.created_at.strftime('%H:%M') }}
-                                        </div>
-
-                                    </td>
-
-                                    <!-- DETAIL -->
-                                    <td class="px-6 py-5 text-center">
-
-                                        <button
-                                            onclick="openDetail(
-                                                '{{ item.nama_anak }}',
-                                                '{{ item.jenis_kelamin }}',
-                                                '{{ item.bb_lahir }}',
-                                                '{{ item.umur }}',
-                                                '{{ item.berat_badan }}',
-                                                '{{ item.tinggi_badan }}',
-                                                '{{ item.tb_ibu }}',
-                                                '{{ item.prediction }}',
-                                                '{{ item.probability }}',
-                                                '{{ item.z_score() }}'
-                                            )"
-                                            class="px-4 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 transition font-medium"
-                                        >
-                                            Detail
-                                        </button>
-
-                                    </td>
-
-                                    <!-- AKSI -->
-                                    <td class="px-6 py-5 text-center">
-
-                                        <button
-                                            onclick="deleteHistory({{ item.id }})"
-                                            aria-label="Hapus riwayat prediksi"
-                                            class="w-11 h-11 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition flex items-center justify-center"
-                                        >
-                                            <svg class="ui-icon text-lg"><use href="#icon-trash"></use></svg>
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-                                {% endfor %}
-
-                            {% else %}
-
-                            <!-- EMPTY STATE -->
-                            <tr>
-
-                                <td colspan="9" class="px-6 py-20 text-center">
-
-                                    <div class="max-w-md mx-auto">
-
-                                        <div class="w-24 h-24 mx-auto rounded-3xl bg-slate-100 text-slate-400 flex items-center justify-center text-5xl mb-6">
-                                            <svg class="ui-icon"><use href="#icon-folder"></use></svg>
-                                        </div>
-
-                                        <h3 class="text-2xl font-bold text-slate-800">
-                                            Belum Ada Riwayat
-                                        </h3>
-
-                                        <p class="text-slate-500 mt-3 leading-relaxed">
-                                            Riwayat prediksi akan muncul setelah
-                                            pengguna melakukan proses prediksi
-                                            stunting pada dashboard sistem.
-                                        </p>
-
-                                        <a
-                                            href="/prediksi"
-                                            class="inline-flex items-center mt-8 px-6 py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-semibold transition"
-                                        >
-                                            Mulai Prediksi
-                                        </a>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                            {% endif %}
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
-</div>
-
-<!-- MODAL DETAIL -->
-<div
-    id="detailModal"
-    class="
-        fixed inset-0
-        bg-black/40
-        backdrop-blur-sm
-        hidden
-        items-center
-        justify-center
-        z-50
-        p-4
-        overflow-y-auto
-    "
->
-
-    <div class="
-        bg-white
-        w-full
-        max-w-2xl
-        rounded-3xl
-        shadow-xl
-        max-h-[90vh]
-        overflow-y-auto
-        p-6 lg:p-8
-    ">
-        <!-- HEADER -->
-        <div class="
-            flex items-center justify-between
-            mb-8
-            sticky
-            bg-white
-            pb-4
-            z-10
-        ">
-
-            <div>
-
-                <h2 class="text-2xl font-bold text-slate-800">
-                    Detail Prediksi
-                </h2>
-
-                <p class="text-slate-500 mt-1">
-                    Informasi lengkap data antropometri anak
-                </p>
-
-            </div>
-
-            <button
-                onclick="closeDetail()"
-                aria-label="Tutup detail prediksi"
-                class="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition flex items-center justify-center"
-            >
-                <svg class="ui-icon text-lg"><use href="#icon-close"></use></svg>
-            </button>
-
-        </div>
-
-        <!-- CONTENT -->
-        <div
-            id="detailContent"
-            class="grid md:grid-cols-2 gap-5"
-        >
-
-        </div>
-
+<header class="flex flex-wrap items-end justify-between gap-4 mb-8">
+    <div>
+        <h1 class="text-display">Riwayat pemeriksaan</h1>
+        <p class="lede mt-4">
+            {{ histories | length }} pemeriksaan tersimpan atas nama {{ fullname }}.
+        </p>
     </div>
 
+    <a href="{{ url_for('main.export_history') }}" class="btn btn--ghost">
+        {{ icon('download', 'base') }} Export Excel
+    </a>
+</header>
+
+<div class="card card--white overflow-hidden">
+    {% if histories %}
+        <div class="overflow-x-auto p-3">
+            <table class="table min-w-[52rem]">
+                <thead class="table-head">
+                    <tr>
+                        <th>Nama anak</th>
+                        <th>Hasil</th>
+                        <th>Probabilitas</th>
+                        <th>Z-Score</th>
+                        <th>Tanggal</th>
+                        <th><span class="sr-only">Aksi</span></th>
+                    </tr>
+                </thead>
+                <tbody data-history-table>
+                    {% for item in histories %}
+                        {% set z = item.z_score() %}
+                        <tr class="table-row" data-row-id="{{ item.id }}">
+                            <td class="table-cell table-cell--name">{{ item.nama_anak }}</td>
+
+                            <td class="table-cell">
+                                {% if item.prediction == 'Stunting' %}
+                                    {{ badge('Stunting', 'risk', size='sm') }}
+                                {% else %}
+                                    {{ badge('Normal', 'safe', size='sm') }}
+                                {% endif %}
+                            </td>
+
+                            <td class="table-cell w-40">
+                                {{ pill_progress(item.probability,
+                                                 'risk' if item.prediction == 'Stunting' else 'safe',
+                                                 value=item.probability ~ '%') }}
+                            </td>
+
+                            <td class="table-cell">
+                                {% if z is none %}
+                                    <span class="micro">&mdash;</span>
+                                {% elif z < -2 %}
+                                    {{ badge(z, 'risk', size='sm') }}
+                                {% else %}
+                                    {{ badge(z, 'outline', size='sm') }}
+                                {% endif %}
+                            </td>
+
+                            <td class="table-cell">
+                                <p>{{ item.created_at.strftime('%d %b %Y') }}</p>
+                                <p class="micro">{{ item.created_at.strftime('%H:%M') }}</p>
+                            </td>
+
+                            <td class="table-cell">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button type="button" class="btn btn--ghost btn--sm" data-action="detail">
+                                        Detail
+                                    </button>
+                                    <button type="button" class="btn btn--danger btn--icon" data-action="delete"
+                                            aria-label="Hapus riwayat {{ item.nama_anak }}">
+                                        {{ icon('trash', 'sm') }}
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        {{ empty_state('folder', 'Belum ada riwayat',
+                       'Setiap prediksi yang kamu jalankan akan tersimpan di sini.',
+                       'Buat prediksi', url_for('main.index')) }}
+    {% endif %}
 </div>
 
-<script>
-
-function openDetail(
-    nama,
-    jk,
-    bb_lahir,
-    umur,
-    bb,
-    tb,
-    tb_ibu,
-    prediction,
-    probability,
-    zscore
-){
-
-    const modal = document.getElementById('detailModal');
-    const content = document.getElementById('detailContent');
-
-    const gender =
-        jk == 1
-        ? 'Laki-laki'
-        : 'Perempuan';
-
-    content.innerHTML = `
-
-        <div class="p-5 rounded-2xl bg-slate-50">
-            <p class="text-sm text-slate-400">Nama Anak</p>
-            <h3 class="font-semibold text-slate-800 mt-1">${nama}</h3>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-slate-50">
-            <p class="text-sm text-slate-400">Jenis Kelamin</p>
-            <h3 class="font-semibold text-slate-800 mt-1">${gender}</h3>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-slate-50">
-            <p class="text-sm text-slate-400">BB Lahir</p>
-            <h3 class="font-semibold text-slate-800 mt-1">${bb_lahir} kg</h3>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-slate-50">
-            <p class="text-sm text-slate-400">Umur</p>
-            <h3 class="font-semibold text-slate-800 mt-1">${umur} bulan</h3>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-slate-50">
-            <p class="text-sm text-slate-400">Berat Badan</p>
-            <h3 class="font-semibold text-slate-800 mt-1">${bb} kg</h3>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-slate-50">
-            <p class="text-sm text-slate-400">Tinggi Badan</p>
-            <h3 class="font-semibold text-slate-800 mt-1">${tb} cm</h3>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-slate-50">
-            <p class="text-sm text-slate-400">TB Ibu</p>
-            <h3 class="font-semibold text-slate-800 mt-1">${tb_ibu} cm</h3>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-indigo-50 border border-indigo-100">
-            <p class="text-sm text-indigo-400">Hasil Prediksi</p>
-            <h3 class="font-bold text-indigo-700 mt-1">${prediction}</h3>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-blue-50 border border-blue-100">
-            <p class="text-sm text-blue-400">Probabilitas</p>
-            <h3 class="font-bold text-blue-700 mt-1">${probability}%</h3>
-        </div>
-
-        <div class="p-5 rounded-2xl bg-amber-50 border border-amber-100 md:col-span-2">
-            <p class="text-sm text-amber-400">Z-Score</p>
-            <h3 class="font-bold text-amber-700 mt-1">${zscore}</h3>
-        </div>
-
-        <!-- REKOMENDASI GIZI -->
-        <div class="p-6 rounded-2xl bg-white border border-slate-200 md:col-span-2">
-
-            <div class="flex items-center gap-3 mb-4">
-
-                <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
-                    <svg class="ui-icon text-xl"><use href="#icon-nutrition"></use></svg>
-                </div>
-
-                <div>
-
-                    <h3 class="font-bold text-slate-800">
-                        Rekomendasi Gizi
-                    </h3>
-
-                    <p class="text-sm text-slate-500">
-                        Berdasarkan hasil prediksi sistem
-                    </p>
-
-                </div>
-
+{# ---- Detail modal ---------------------------------------------------- #}
+<div class="modal" id="detailModal" role="dialog" aria-modal="true" aria-labelledby="detailTitle" hidden>
+    <div class="modal-card">
+        <div class="modal-head">
+            <div>
+                <h2 class="card-title" id="detailTitle" data-slot="nama">Detail pemeriksaan</h2>
+                <p class="card-sub" data-slot="created"></p>
             </div>
-
-            ${
-                prediction === "Stunting"
-                ?
-                `
-                <div class="rounded-xl bg-amber-50 border border-amber-200 p-4">
-
-                    <ul class="list-disc pl-5 space-y-2 text-sm text-amber-900">
-
-                        <li>Berikan protein hewani (telur, ikan, ayam atau daging) setiap hari.</li>
-
-                        <li>Tingkatkan konsumsi buah dan sayuran yang kaya vitamin dan mineral.</li>
-
-                        <li>Lakukan pengukuran berat badan dan tinggi badan setiap bulan di Posyandu.</li>
-
-                        <li>Konsultasikan ke dokter atau petugas gizi untuk mendapatkan intervensi lanjutan.</li>
-
-                        <li>Pastikan anak mendapatkan imunisasi lengkap serta lingkungan yang bersih.</li>
-
-                    </ul>
-
-                </div>
-                `
-                :
-                `
-                <div class="rounded-xl bg-emerald-50 border border-emerald-200 p-4">
-
-                    <ul class="list-disc pl-5 space-y-2 text-sm text-emerald-900">
-
-                        <li>Pertahankan pola makan bergizi seimbang sesuai pedoman Isi Piringku.</li>
-
-                        <li>Berikan protein hewani, sayur, buah dan susu sesuai kebutuhan usia.</li>
-
-                        <li>Lakukan pemantauan pertumbuhan setiap bulan di Posyandu.</li>
-
-                        <li>Berikan stimulasi tumbuh kembang sesuai usia anak.</li>
-
-                        <li>Terapkan PHBS (Perilaku Hidup Bersih dan Sehat) di lingkungan keluarga.</li>
-
-                    </ul>
-
-                </div>
-                `
-            }
-
+            <button type="button" class="btn btn--ghost btn--icon" data-modal-close
+                    aria-label="Tutup detail" data-autofocus>
+                {{ icon('close', 'sm') }}
+            </button>
         </div>
 
-    `;
+        <div class="modal-body">
+            <div class="grid sm:grid-cols-2 gap-3" data-slot="tiles"></div>
 
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-}
+            <div class="result-rec">
+                <h4>Rekomendasi gizi</h4>
+                <p class="prose-body" style="color: inherit" data-slot="rekomendasi"></p>
+            </div>
+        </div>
+    </div>
+</div>
 
-function closeDetail(){
+{# ---- Delete confirmation --------------------------------------------- #}
+<div class="modal" id="deleteModal" role="dialog" aria-modal="true" aria-labelledby="deleteTitle" hidden>
+    <div class="modal-card modal-card--sm">
+        <div class="modal-head">
+            <h2 class="card-title" id="deleteTitle">Hapus riwayat?</h2>
+        </div>
+        <div class="modal-body">
+            <p class="prose-body" data-slot="confirm"></p>
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn btn--ghost btn--sm" data-modal-close data-autofocus>Batal</button>
+            <button type="button" class="btn btn--danger btn--sm" id="confirmDelete">Hapus</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-    const modal = document.getElementById('detailModal');
+{% block page_data %}
+<script id="history-data" type="application/json">{{ history_rows | tojson }}</script>
+{% endblock %}
 
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-}
-
-
-
-async function deleteHistory(id){
-
-    const confirmDelete = confirm(
-        "Yakin ingin menghapus riwayat prediksi ini?"
-    );
-
-    if(!confirmDelete) return;
-
-    try{
-
-        const response = await fetch(`/history/delete/${id}`, {
-            method: 'POST'
-        });
-
-        const data = await response.json();
-
-        if(data.success){
-
-            location.reload();
-
-        }
-
-    }catch(error){
-
-        alert("Terjadi kesalahan saat menghapus data");
-
-    }
-
-}
-
-</script>
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/history.js', v=asset_v) }}"></script>
 {% endblock %}

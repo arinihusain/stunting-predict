@@ -1,938 +1,180 @@
 {% extends "base.html" %}
+{% from '_macros.html' import icon, field, select_field, badge, progress_ring,
+         empty_state with context %}
+
+{% block title %}Prediksi — Sistem Prediksi Stunting{% endblock %}
 
 {% block content %}
 
-<div class="h-screen app-shell flex overflow-hidden">
+<header class="mb-8">
+    <h1 class="text-display">Prediksi risiko stunting</h1>
+    <p class="lede mt-4">
+        Masukkan data antropometri anak. Hasil muncul di sebelah kanan dan tersimpan
+        otomatis ke riwayat.
+    </p>
+</header>
 
-    <!-- SIDEBAR -->
-    <aside class="w-72 app-sidebar border-r border-slate-200 h-screen overflow-y-auto hidden lg:flex flex-col">
+<div class="grid xl:grid-cols-3 gap-5">
 
-        <div class="flex justify-end px-4 pt-3">
-            <button
-                type="button"
-                onclick="toggleTheme()"
-                aria-label="Ganti mode tampilan"
-                title="Ganti mode tampilan"
-                class="theme-toggle-btn w-8 h-8 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon theme-icon-moon"><use href="#icon-moon"></use></svg>
-                <svg class="ui-icon theme-icon-sun"><use href="#icon-sun"></use></svg>
-            </button>
-        </div>
+    {# ---- Form ---------------------------------------------------------- #}
+    <div class="xl:col-span-2">
+        <form id="predictionForm" class="card card--white p-7" data-validate>
 
-        <!-- LOGO -->
-        <div class="px-8 pb-8 pt-2 border-b border-slate-100">
+            {# Every field sits in a two-column grid: at full-bleed width a single
+               input would otherwise stretch most of the screen. #}
+            <div class="grid sm:grid-cols-2 gap-x-5 gap-y-5">
 
-            <div class="flex items-center gap-4">
+                {{ field('nama_anak', 'Nama anak', maxlength=50, autocomplete='off',
+                         placeholder='Nama lengkap anak', msg='Nama anak wajib diisi.') }}
 
-                <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl">
-                    <svg class="ui-icon"><use href="#icon-stethoscope"></use></svg>
+                {{ select_field('jenis_kelamin', 'Jenis kelamin',
+                                [('1', 'Laki-laki'), ('0', 'Perempuan')],
+                                placeholder='Pilih jenis kelamin',
+                                msg='Jenis kelamin wajib dipilih.') }}
+
+                {{ field('umur', 'Umur', type='number', step='1', min=0, max=60,
+                         unit='bulan', affix='bln', placeholder='24',
+                         hint='0 sampai 60 bulan.', msg='Umur wajib diisi.') }}
+
+                {{ field('bb_lahir', 'Berat badan lahir', type='number', step='0.1',
+                         min=0.5, max=8, unit='kg', affix='kg', placeholder='3.2',
+                         msg='Berat badan lahir wajib diisi.') }}
+
+                {{ field('berat_badan', 'Berat badan', type='number', step='0.1',
+                         min=1, max=60, unit='kg', affix='kg', placeholder='11.5',
+                         msg='Berat badan wajib diisi.') }}
+
+                {{ field('tinggi_badan', 'Tinggi badan', type='number', step='0.1',
+                         min=30, max=150, unit='cm', affix='cm', placeholder='84.0',
+                         msg='Tinggi badan wajib diisi.') }}
+
+                {{ field('tb_ibu', 'Tinggi badan ibu', type='number', step='0.1',
+                         min=100, max=200, unit='cm', affix='cm', placeholder='155.0',
+                         hint='Faktor maternal yang ikut diperhitungkan model.',
+                         msg='Tinggi badan ibu wajib diisi.') }}
+
+                <div class="flex items-end">
+                    <button type="submit" id="predictButton" class="btn btn--primary btn--lg btn--block">
+                        <span class="btn-spinner" aria-hidden="true"></span>
+                        <span data-slot="button-text">Jalankan prediksi</span>
+                    </button>
                 </div>
-
-                <div>
-
-                    <h1 class="text-xl font-bold text-slate-800 leading-tight">
-                        Sistem Prediksi
-                    </h1>
-
-                    <p class="text-slate-500 text-sm">
-                        Stunting Dashboard
-                    </p>
-
-                </div>
-
             </div>
+        </form>
+    </div>
 
+    {# ---- Result -------------------------------------------------------- #}
+    <div>
+        <div id="resultArea" class="xl:sticky xl:top-6">
+            <div class="card card--cream hatch-panel p-7">
+                {{ empty_state('chart', 'Belum ada hasil',
+                               'Isi data anak, lalu jalankan prediksi untuk melihat probabilitas dan Z-Score.') }}
+            </div>
         </div>
-
-        <!-- PROFILE -->
-        <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between gap-3">
-
-            <div>
-                <p class="text-sm text-slate-400">
-                    Login sebagai
-                </p>
-
-                <h3 class="font-semibold text-slate-800 mt-1">
-                    {{ fullname }}
-                </h3>
-            </div>
-
-            <a
-                href="/logout"
-                aria-label="Logout"
-                title="Logout"
-                class="w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon"><use href="#icon-logout"></use></svg>
-            </a>
-
-        </div>
-
-        <!-- NAVIGATION -->
-        <nav class="flex-1 px-5 py-6">
-
-            <p class="text-xs uppercase tracking-wider text-slate-400 px-3 mb-4">
-                Menu Utama
-            </p>
-
-            <div class="space-y-2">
-
-                <!-- DASHBOARD -->
-                <a
-                    href="/"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-dashboard"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Dashboard
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Statistik Sistem
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- PREDIKSI -->
-                <a
-                    href="/prediksi"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl bg-indigo-50 text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-lg">
-                        <svg class="ui-icon"><use href="#icon-chart"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-semibold">
-                            Prediksi
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Prediksi Stunting
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- HISTORY -->
-                <a
-                    href="/history"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-clipboard"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Riwayat
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Riwayat Prediksi
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- TENTANG -->
-                <a
-                    href="/tentang"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-info"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Tentang
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Tentang
-                        </p>
-                    </div>
-
-                </a>
-
-            </div>
-
-        </nav>
-
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="app-main flex-1 h-screen overflow-y-auto">
-
-        <!-- MOBILE HEADER -->
-        <div class="lg:hidden bg-white border-b border-slate-200 px-6 py-5 flex items-center justify-between gap-4">
-
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">
-                    Sistem Prediksi Stunting
-                </h1>
-
-                <p class="text-slate-500 text-sm mt-1">
-                    Selamat datang, {{ fullname }}
-                </p>
-            </div>
-
-            <button
-                type="button"
-                onclick="toggleTheme()"
-                aria-label="Ganti mode tampilan"
-                title="Ganti mode tampilan"
-                class="theme-toggle-btn w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon theme-icon-moon"><use href="#icon-moon"></use></svg>
-                <svg class="ui-icon theme-icon-sun"><use href="#icon-sun"></use></svg>
-            </button>
-
-        </div>
-
-        <!-- CONTENT -->
-        <div class="p-6 lg:p-10">
-
-            <!-- HERO -->
-            <div class="mb-10">
-
-                <div class="hero-panel rounded-3xl p-8 shadow-sm">
-
-                    <div class="max-w-3xl">
-
-                        <div class="flex items-center gap-4 mb-5">
-
-                            <div class="w-14 h-14 rounded-2xl bg-white/20 flex items-center justify-center text-3xl">
-                                <svg class="ui-icon"><use href="#icon-stethoscope"></use></svg>
-                            </div>
-
-                            <div>
-
-                                <h2 class="text-2xl font-bold">
-                                    Deteksi Risiko Stunting Anak
-                                </h2>
-
-                                <p class="text-white/80 mt-1">
-                                    Berbasis Statistical Learning Regresi Logistik
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                        <p class="text-white/80 leading-relaxed">
-                            Sistem membantu tenaga kesehatan melakukan skrining
-                            risiko stunting menggunakan data antropometri anak
-                            secara cepat, objektif, dan real-time.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- GRID -->
-            <div class="grid lg:grid-cols-5 gap-8">
-
-                <!-- FORM CARD -->
-                <div class="lg:col-span-3">
-
-                    <div class="surface-card bg-white rounded-3xl p-8">
-
-                        <div class="mb-8">
-
-                            <h2 class="text-2xl font-bold text-slate-800">
-                                Input Data Antropometri
-                            </h2>
-
-                            <p class="text-slate-500 mt-2">
-                                Masukkan data pengukuran anak dengan lengkap.
-                            </p>
-
-                        </div>
-
-                        <form id="predictionForm" class="space-y-6">
-
-                            <!-- NAMA -->
-                            <div>
-
-                                <label class="block mb-2 text-sm font-medium text-slate-700">
-                                    Nama Anak
-                                </label>
-
-                                <input
-                                    type="text"
-                                    name="nama_anak"
-                                    required
-                                    maxlength="50"
-                                    placeholder="Masukkan nama anak"
-                                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
-
-                                    oninvalid="
-                                        this.classList.add('border-red-500','ring-4','ring-red-100');
-                                        this.setCustomValidity('Nama anak wajib diisi');
-                                    "
-
-                                    oninput="
-                                        this.classList.remove('border-red-500','ring-4','ring-red-100');
-                                        this.setCustomValidity('');
-                                    "
-                                >
-
-                            </div>
-
-                            <!-- JK -->
-                            <div>
-
-                                <label class="block mb-2 text-sm font-medium text-slate-700">
-                                    Jenis Kelamin
-                                </label>
-
-                                <select
-                                    name="jenis_kelamin"
-                                    class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
-                                >
-                                    <option value="0">
-                                        Perempuan
-                                    </option>
-
-                                    <option value="1">
-                                        Laki-laki
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-                            <!-- GRID -->
-                            <div class="grid md:grid-cols-2 gap-5">
-
-                                <div>
-
-                                    <label class="block mb-2 text-sm font-medium text-slate-700">
-                                        Berat Badan Lahir (kg)
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        step="0.1"
-                                        inputmode="decimal"
-                                        name="bb_lahir"
-                                        placeholder="Contoh: 3.2"
-                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
-
-                                        oninvalid="
-                                            this.classList.add('border-red-500','ring-4','ring-red-100');
-                                            this.setCustomValidity('Berat badan lahir wajib diisi');
-                                        "
-
-                                        oninput="
-                                            this.classList.remove('border-red-500','ring-4','ring-red-100');
-                                            this.setCustomValidity('');
-                                        "                                        required
-                                    >
-
-                                </div>
-
-                                <div>
-
-                                    <label class="block mb-2 text-sm font-medium text-slate-700">
-                                        Umur (bulan)
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        max="60"
-                                        min="0"
-                                        name="umur"
-                                        placeholder="Contoh: 24"
-                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
-
-                                        oninvalid="
-                                            this.classList.add('border-red-500','ring-4','ring-red-100');
-                                            this.setCustomValidity('Umur wajib diisi');
-                                        "
-
-                                        oninput="
-                                            this.value = Math.min(parseFloat(this.value) || 0, 60);
-                                            this.classList.remove('border-red-500','ring-4','ring-red-100');
-                                            this.setCustomValidity('');
-                                        "                                        required
-                                    >
-
-                                </div>
-
-                            </div>
-
-                            <div class="grid md:grid-cols-2 gap-5">
-
-                                <div>
-
-                                    <label class="block mb-2 text-sm font-medium text-slate-700">
-                                        Berat Badan (kg)
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        step="0.1"
-                                        name="berat_badan"
-                                        placeholder="Contoh: 10.5 atau 10,5"
-                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
-
-                                        oninvalid="
-                                            this.classList.add('border-red-500','ring-4','ring-red-100');
-                                            this.setCustomValidity('Berat badan wajib diisi');
-                                        "
-
-                                        oninput="
-                                            this.classList.remove('border-red-500','ring-4','ring-red-100');
-                                            this.setCustomValidity('');
-                                        "                                        required
-                                    >
-
-                                </div>
-
-                                <div>
-
-                                    <label class="block mb-2 text-sm font-medium text-slate-700">
-                                        Tinggi Badan (cm)
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        step="0.1"
-                                        name="tinggi_badan"
-                                        placeholder="Contoh: 84.5 atau 84,5"
-                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
-
-                                        oninvalid="
-                                            this.classList.add('border-red-500','ring-4','ring-red-100');
-                                            this.setCustomValidity('Tinggi badan wajib diisi');
-                                        "
-
-                                        oninput="
-                                            this.classList.remove('border-red-500','ring-4','ring-red-100');
-                                            this.setCustomValidity('');
-                                        "                                        required
-                                    >
-
-                                </div>
-
-                            </div>
-
-                            <div class="grid md:grid-cols-1 gap-5">
-
-
-                                <div>
-
-                                    <label class="block mb-2 text-sm font-medium text-slate-700">
-                                        Tinggi Badan Ibu (cm)
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        step="0.1"
-                                        name="tb_ibu"
-                                        placeholder="Contoh: 155 atau 155,0"
-                                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 p-4 focus:ring-4 focus:ring-indigo-100 outline-none"
-
-                                        oninvalid="
-                                            this.classList.add('border-red-500','ring-4','ring-red-100');
-                                            this.setCustomValidity('Tinggi badan ibu wajib diisi');
-                                        "
-
-                                        oninput="
-                                            this.classList.remove('border-red-500','ring-4','ring-red-100');
-                                            this.setCustomValidity('');
-                                        "                                        required
-                                    >
-
-                                </div>
-
-                            </div>
-
-                            <!-- BUTTON -->
-                            <button
-                                id="predictButton"
-                                type="submit"
-                                class="w-full bg-indigo-500 hover:bg-indigo-600 transition-all duration-300 text-white py-4 rounded-2xl font-semibold shadow-sm hover:shadow-md flex items-center justify-center gap-3 disabled:cursor-not-allowed"
-                            >
-                                <span id="buttonText">
-                                    Prediksi Risiko Stunting
-                                </span>
-
-                                <svg
-                                    id="buttonLoader"
-                                    class="hidden animate-spin h-5 w-5 text-white"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <circle
-                                        class="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        stroke-width="4"
-                                    ></circle>
-
-                                    <path
-                                        class="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                                    ></path>
-                                </svg>
-                            </button>
-
-                        </form>
-
-                    </div>
-
-                </div>
-
-                <!-- RESULT CARD -->
-                <div class="lg:col-span-2">
-
-                    <div class="surface-card bg-white rounded-3xl p-8 sticky top-10">
-
-                        <div id="resultArea">
-
-                            <div class="text-center py-12">
-
-                                <div class="w-24 h-24 mx-auto rounded-3xl bg-slate-100 text-slate-400 flex items-center justify-center text-5xl mb-6">
-                                    <svg class="ui-icon"><use href="#icon-chart"></use></svg>
-                                </div>
-
-                                <h2 class="text-2xl font-bold text-slate-800">
-                                    Hasil Prediksi
-                                </h2>
-
-                                <p class="text-slate-500 mt-3 leading-relaxed">
-                                    Hasil analisis risiko stunting akan muncul
-                                    setelah data antropometri diproses.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
+    </div>
 </div>
 
-<script>
+{# ---- Inert templates: the result markup lives in Jinja, not in a JS string.
+       JS only clones these and fills [data-slot] nodes with textContent. ---- #}
 
-const form = document.getElementById('predictionForm');
+<template id="tpl-loading">
+    <div class="card card--cream p-7">
+        <div class="empty-state">
+            <div class="empty-state-icon"><span class="btn-spinner" style="display:inline-block"></span></div>
+            <h3 class="empty-state-title">Menganalisis data</h3>
+            <p class="empty-state-body">Model sedang menghitung probabilitas dan Z-Score.</p>
+        </div>
+    </div>
+</template>
 
-const resultArea = document.getElementById('resultArea');
-
-const predictButton = document.getElementById('predictButton');
-
-const buttonText = document.getElementById('buttonText');
-
-const buttonLoader = document.getElementById('buttonLoader');
-
-const nameInput = form.elements.namedItem('nama_anak');
-
-form.querySelectorAll("input").forEach(input => {
-    input.classList.remove(
-        "border-red-500",
-        "ring-4",
-        "ring-red-100"
-    );
-});
-
-form.addEventListener('submit', async (e) => {
-
-    e.preventDefault();
-
-    // =========================
-    // VALIDASI REQUIRED
-    // =========================
-
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-
-    // =========================
-    // VALIDASI DESIMAL
-    // =========================
-
-    const decimalFields = [
-        "bb_lahir",
-        "berat_badan",
-        "tinggi_badan",
-        "tb_ibu"
-    ];
-
-    for (const field of decimalFields) {
-
-        const input = form.querySelector(`[name="${field}"]`);
-
-        if (input.value.includes(",")) {
-
-            alert("Gunakan tanda titik (.) sebagai desimal, bukan koma (,).");
-
-            input.focus();
-
-            return;
-        }
-
-    }
-
-
-    // =========================
-    // BUTTON LOADING
-    // =========================
-
-    predictButton.disabled = true;
-
-    predictButton.classList.add(
-        'opacity-70',
-        'cursor-not-allowed'
-    );
-
-    buttonText.innerText = 'Memproses Prediksi...';
-
-    buttonLoader.classList.remove('hidden');
-
-    // =========================
-    // LOADING RESULT CARD
-    // =========================
-
-    resultArea.innerHTML = `
-
-        <div class="flex flex-col items-center justify-center py-16">
-
-            <div class="relative mb-8">
-
-                <div class="w-24 h-24 rounded-full border-4 border-indigo-100"></div>
-
-                <div class="absolute inset-0 w-24 h-24 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
-
+<template id="tpl-error">
+    <div class="card card--white p-7">
+        <div class="empty-state">
+            <div class="empty-state-icon" style="background: var(--danger-bg); color: var(--danger-fg)">
+                {{ icon('error', 'xl') }}
             </div>
+            <h3 class="empty-state-title" data-slot="title">Prediksi gagal</h3>
+            <p class="empty-state-body" data-slot="message"></p>
+        </div>
+    </div>
+</template>
 
-            <h3 class="text-2xl font-bold text-slate-800 mb-3">
-                Sedang Menganalisis Data
-            </h3>
+<template id="tpl-result">
+    <div class="card card--white p-7 animate-fadeIn" data-tone="safe">
 
-            <p class="text-slate-500 text-center leading-relaxed max-w-sm">
-                Sistem Statistical learning sedang melakukan inferensi
-                terhadap data antropometri anak.
-            </p>
-
+        <div class="card-head">
+            <h2 class="card-title">Hasil prediksi</h2>
+            <span class="only-risk">{{ badge('Stunting', 'risk', 'warning') }}</span>
+            <span class="only-safe">{{ badge('Normal', 'safe', 'check') }}</span>
         </div>
 
-    `;
+        <p class="form-flash" data-slot="save-warning" hidden></p>
 
-    try {
+        <div class="flex justify-center py-2">
+            {{ progress_ring(0, '0%', 'Probabilitas') }}
+        </div>
 
-        const formData = new FormData(form);
-
-        const response = await fetch('/predict', {
-            method: 'POST',
-            body: formData
-        });
-
-        const data = await response.json();
-
-        if(data.success){
-
-            const prediction = data.result.prediction;
-
-            const probability = data.result.probability;
-
-            const zScore = data.result.z_score;
-
-            const zStatus = data.result.z_status;
-
-            const iconWarning = '<svg class="ui-icon" aria-hidden="true"><use href="#icon-warning"></use></svg>';
-
-            const iconCheck = '<svg class="ui-icon" aria-hidden="true"><use href="#icon-check"></use></svg>';
-
-            let cardStyle = prediction === "Stunting"
-                ? "bg-amber-50 border-amber-100"
-                : "bg-emerald-50 border-emerald-100";
-
-            let badgeStyle = prediction === "Stunting"
-                ? "bg-amber-100 text-amber-700"
-                : "bg-emerald-100 text-emerald-700";
-
-            resultArea.innerHTML = `
-
-                <div class="rounded-3xl border p-8 ${cardStyle} animate-fadeIn">
-
-                    <div class="text-center">
-
-                        <!-- ICON -->
-                        <div class="text-7xl text-slate-700 mb-6">
-                            ${prediction === "Stunting" ? iconWarning : iconCheck}
-                        </div>
-
-                        <!-- LABEL -->
-                        <div class="inline-flex items-center px-5 py-2 rounded-full ${badgeStyle} font-semibold mb-6">
-                            ${prediction}
-                        </div>
-
-                        <!-- MAIN RESULT -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-
-                            <!-- PROBABILITY -->
-                            <div class="bg-white/70 rounded-2xl p-5 border border-white/50">
-
-                                <p class="text-sm text-slate-500 mb-2">
-                                    Probabilitas Risiko
-                                </p>
-
-                                <h3 class="text-4xl font-bold text-slate-800">
-                                    ${probability}%
-                                </h3>
-
-                            </div>
-
-                            <!-- Z SCORE -->
-                            <div class="bg-white/70 rounded-2xl p-5 border border-white/50">
-
-                                <p class="text-sm text-slate-500 mb-2">
-                                    Z-Score
-                                </p>
-
-                                <h3 class="text-4xl font-bold text-slate-800">
-                                    ${zScore}
-                                </h3>
-
-                            </div>
-
-                        </div>
-
-                        <div class="bg-white rounded-2xl p-6 text-left border border-slate-100 shadow-sm mb-4">
-                            <div class="flex items-center gap-3 mb-3">
-                                <span class="text-2xl text-emerald-600"><svg class="ui-icon" aria-hidden="true"><use href="#icon-nutrition"></use></svg></span>
-                                <h4 class="font-bold text-slate-800">Rekomendasi Gizi</h4>
-                            </div>
-
-                            <div class="text-slate-600 text-sm leading-relaxed">
-                                ${
-                                    prediction === "Stunting"
-                                    ? `
-                                    <ul class="list-disc pl-5 space-y-2 text-amber-900">
-                                        <li><b>Intervensi Protein Hewani:</b> Berikan telur, ikan, atau daging setiap hari untuk mendukung pertumbuhan tulang linear.</li>
-                                        <li><b>Konsultasi Medis:</b> Segera bawa anak ke Puskesmas atau dokter spesialis anak di Kabupaten Bulukumba untuk pemeriksaan klinis.</li>
-                                        <li><b>Pola Asuh:</b> Terapkan praktik pemberian makan yang responsif dan pastikan kebersihan lingkungan (sanitasi) terjaga.</li>
-                                    </ul>
-                                    `
-                                    : `
-                                    <ul class="list-disc pl-5 space-y-2 text-emerald-900">
-                                        <li><b>Pertahankan Gizi:</b> Lanjutkan pola makan gizi seimbang sesuai panduan "Isi Piringku".</li>
-                                        <li><b>Pemantauan Rutin:</b> Tetap lakukan penimbangan dan pengukuran tinggi badan di Posyandu setiap bulan.</li>
-                                        <li><b>Stimulasi:</b> Berikan stimulasi psikososial sesuai kelompok umur untuk mendukung perkembangan kognitif.</li>
-                                    </ul>
-                                    `
-                                }
-                            </div>
-                        </div>
-
-
-                        <!-- INTERPRETATION -->
-                        <div class="bg-white/70 rounded-2xl p-5 text-left border border-white/50">
-
-                            <div class="flex items-center justify-between mb-3">
-
-                                <h4 class="font-semibold text-slate-700">
-                                    Interpretasi Sistem
-                                </h4>
-
-                                <span class="text-xl text-indigo-600">
-                                    <svg class="ui-icon" aria-hidden="true"><use href="#icon-brain"></use></svg>
-                                </span>
-
-                            </div>
-
-                            <p class="text-slate-600 leading-relaxed text-sm">
-
-                                ${
-                                    prediction === "Stunting"
-                                    ?
-                                    "Anak memiliki kecenderungan risiko stunting berdasarkan hasil inferensi Statistical learning dan evaluasi antropometri. Disarankan dilakukan pemeriksaan lanjutan oleh tenaga kesehatan."
-                                    :
-                                    "Data antropometri menunjukkan kondisi pertumbuhan anak masih berada dalam kategori normal berdasarkan hasil inferensi model."
-                                }
-
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            `;
-
-        } else {
-
-            resultArea.innerHTML = `
-
-                <div class="rounded-3xl border border-red-100 bg-red-50 p-8">
-
-                    <div class="text-center">
-
-                        <div class="text-6xl text-red-500 mb-5">
-                            <svg class="ui-icon" aria-hidden="true"><use href="#icon-error"></use></svg>
-                        </div>
-
-                        <h3 class="text-2xl font-bold text-red-700 mb-3">
-                            Prediksi Gagal
-                        </h3>
-
-                        <p class="text-red-600">
-                            Terjadi kesalahan saat memproses data.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            `;
-
-        }
-
-    } catch (error) {
-
-        resultArea.innerHTML = `
-
-            <div class="rounded-3xl border border-red-100 bg-red-50 p-8">
-
-                <div class="text-center">
-
-                    <div class="text-6xl text-red-500 mb-5">
-                        <svg class="ui-icon" aria-hidden="true"><use href="#icon-error"></use></svg>
-                    </div>
-
-                    <h3 class="text-2xl font-bold text-red-700 mb-3">
-                        Koneksi Bermasalah
-                    </h3>
-
-                    <p class="text-red-600 leading-relaxed">
-                        Tidak dapat terhubung ke server prediksi.
-                    </p>
-
-                </div>
-
+        <div class="grid grid-cols-2 gap-3 mt-5">
+            <div class="kv-tile">
+                <p class="kv-label">Z-Score (TB/U)</p>
+                <p class="kv-value" data-slot="zscore">&mdash;</p>
             </div>
+            <div class="kv-tile">
+                <p class="kv-label">Status WHO</p>
+                <p class="kv-value" data-slot="zstatus">&mdash;</p>
+            </div>
+        </div>
 
-        `;
+        <div class="result-rec">
+            <h4>Rekomendasi gizi</h4>
+            <p class="prose-body" style="color: inherit" data-slot="rekomendasi"></p>
 
-    } finally {
+            <ul class="checklist mt-3 only-risk">
+                <li class="check-item">
+                    <span class="check-tile">{{ icon('nutrition', 'sm') }}</span>
+                    <div class="check-body"><p class="check-meta">Protein hewani setiap hari: telur, ikan, atau daging.</p></div>
+                </li>
+                <li class="check-item">
+                    <span class="check-tile">{{ icon('stethoscope', 'sm') }}</span>
+                    <div class="check-body"><p class="check-meta">Periksa ke Puskesmas atau dokter spesialis anak.</p></div>
+                </li>
+                <li class="check-item">
+                    <span class="check-tile">{{ icon('user', 'sm') }}</span>
+                    <div class="check-body"><p class="check-meta">Pemberian makan responsif dan sanitasi terjaga.</p></div>
+                </li>
+            </ul>
 
-        // =========================
-        // RESET BUTTON
-        // =========================
+            <ul class="checklist mt-3 only-safe">
+                <li class="check-item">
+                    <span class="check-tile">{{ icon('nutrition', 'sm') }}</span>
+                    <div class="check-body"><p class="check-meta">Lanjutkan gizi seimbang sesuai panduan Isi Piringku.</p></div>
+                </li>
+                <li class="check-item">
+                    <span class="check-tile">{{ icon('calendar', 'sm') }}</span>
+                    <div class="check-body"><p class="check-meta">Timbang dan ukur tinggi badan di Posyandu setiap bulan.</p></div>
+                </li>
+                <li class="check-item">
+                    <span class="check-tile">{{ icon('brain', 'sm') }}</span>
+                    <div class="check-body"><p class="check-meta">Beri stimulasi psikososial sesuai kelompok umur.</p></div>
+                </li>
+            </ul>
+        </div>
 
-        predictButton.disabled = false;
+        <div class="result-interp">
+            <h4>Interpretasi</h4>
+            <p class="only-risk">
+                Anak cenderung berisiko stunting menurut hasil model dan evaluasi
+                antropometri. Pemeriksaan lanjutan oleh tenaga kesehatan disarankan.
+            </p>
+            <p class="only-safe">
+                Data antropometri menunjukkan pertumbuhan anak masih dalam kategori
+                normal menurut hasil model.
+            </p>
+        </div>
+    </div>
+</template>
+{% endblock %}
 
-        predictButton.classList.remove(
-            'opacity-70',
-            'cursor-not-allowed'
-        );
-
-        buttonText.innerText = 'Prediksi Risiko Stunting';
-
-        buttonLoader.classList.add('hidden');
-
-    }
-
-
-
-});
-
-document.querySelectorAll('input[required], select[required]').forEach(el => {
-
-    el.addEventListener('input', function () {
-        this.setCustomValidity('');
-    });
-
-    el.addEventListener('change', function () {
-        this.setCustomValidity('');
-    });
-
-});
-
-const messages = {
-    nama_anak: "Nama anak wajib diisi.",
-    jenis_kelamin: "Jenis kelamin wajib dipilih.",
-    bb_lahir: "Berat badan lahir wajib diisi.",
-    umur: "Umur wajib diisi.",
-    berat_badan: "Berat badan wajib diisi.",
-    tinggi_badan: "Tinggi badan wajib diisi.",
-    tb_ibu: "Tinggi badan ibu wajib diisi."
-};
-
-document.querySelectorAll(".decimal-input").forEach(input => {
-
-    input.addEventListener("input", function () {
-
-        if (this.value.includes(",")) {
-
-            this.setCustomValidity(
-                "Gunakan titik (.) sebagai desimal."
-            );
-
-            this.reportValidity();
-
-            this.value = this.value.replace(/,/g, "");
-
-            return;
-
-        }
-
-        this.setCustomValidity("");
-
-    });
-
-});
-
-document.querySelectorAll(".decimal-input").forEach(input=>{
-
-    input.addEventListener("input",function(){
-
-        if(Number(this.value)<0){
-
-            this.value="";
-
-        }
-
-    });
-
-});
-
-nameInput.addEventListener("input",function(){
-
-    this.value=this.value.substring(0,50);
-
-});
-
-</script>
-
+{% block scripts %}
+<script defer src="{{ url_for('static', filename='js/prediksi.js', v=asset_v) }}"></script>
 {% endblock %}

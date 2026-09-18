@@ -1,0 +1,68 @@
+{# Top navigation: outlined wordmark, a compact centred nav pill, and the
+   action cluster (labelled control + circle + avatar), as in the reference. #}
+{% set nav_items = [
+    ('main.summary', 'Dashboard', 'dashboard'),
+    ('main.index',   'Prediksi',  'stethoscope'),
+    ('main.history', 'Riwayat',   'clipboard'),
+    ('main.tentang', 'Tentang',   'info')
+] %}
+
+<header class="pt-5 pb-2 mb-8">
+    <div class="shell flex items-center gap-3">
+
+        <a href="{{ url_for('main.summary') }}" class="navpill-logo flex items-center px-5 sm:px-6 py-3 shrink-0">
+            <span class="font-display font-semibold text-base sm:text-lg tracking-tight">Stunting&nbsp;Predict</span>
+        </a>
+
+        <div class="hidden lg:flex flex-1 justify-center">
+            <nav class="navpill-nav items-center gap-1 px-2 py-2" aria-label="Navigasi utama">
+                {% for endpoint, label, _ in nav_items %}
+                    <a href="{{ url_for(endpoint) }}"
+                       class="nav-pill-link {{ 'nav-pill-link-active' if request.endpoint == endpoint }}"
+                       aria-current="{{ 'page' if request.endpoint == endpoint else 'false' }}">{{ label }}</a>
+                {% endfor %}
+            </nav>
+        </div>
+
+        <div class="hidden lg:flex items-center gap-2 shrink-0">
+            <button type="button" data-theme-toggle class="navpill-action theme-toggle">
+                <svg class="ui-icon text-base icon-when-dark"><use href="#icon-moon"></use></svg>
+                <svg class="ui-icon text-base icon-when-light"><use href="#icon-sun"></use></svg>
+                Tema
+            </button>
+
+            <a href="{{ url_for('auth.logout') }}" class="navpill-round" title="Keluar" aria-label="Keluar">
+                <svg class="ui-icon text-lg"><use href="#icon-logout"></use></svg>
+            </a>
+
+            <span class="navpill-avatar" title="{{ fullname }}">{{ (fullname or '?')[:1]|upper }}</span>
+        </div>
+
+        <button type="button" data-nav-toggle aria-expanded="false" aria-controls="mobileNavSheet"
+                aria-label="Buka menu"
+                class="navpill-logo lg:hidden ml-auto w-12 h-12 shrink-0 flex items-center justify-center">
+            <svg class="ui-icon text-lg"><use href="#icon-menu"></use></svg>
+        </button>
+    </div>
+
+    <div id="mobileNavSheet" class="shell lg:hidden mt-3" hidden>
+        <div class="nav-sheet p-3 space-y-1">
+            {% for endpoint, label, icon_name in nav_items %}
+                <a href="{{ url_for(endpoint) }}"
+                   class="mobile-nav-link {{ 'mobile-nav-link-active' if request.endpoint == endpoint }}">
+                    <svg class="ui-icon text-base"><use href="#icon-{{ icon_name }}"></use></svg>{{ label }}
+                </a>
+            {% endfor %}
+
+            <button type="button" data-theme-toggle class="mobile-nav-link theme-toggle w-full">
+                <svg class="ui-icon text-base icon-when-dark"><use href="#icon-moon"></use></svg>
+                <svg class="ui-icon text-base icon-when-light"><use href="#icon-sun"></use></svg>
+                Ganti tema
+            </button>
+
+            <a href="{{ url_for('auth.logout') }}" class="mobile-nav-link mobile-nav-link-danger">
+                <svg class="ui-icon text-base"><use href="#icon-logout"></use></svg>Keluar
+            </a>
+        </div>
+    </div>
+</header>

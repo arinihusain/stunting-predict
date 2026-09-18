@@ -24,7 +24,20 @@ class Prediction(db.Model):
     )
 
     def z_score(self):
-        median_tb = 49 + (self.umur * 1.5)
-        sd = 3.5
-        score = (self.tinggi_badan - median_tb) / sd
-        return round(score, 2)
+        """TB/U z-score from the WHO LMS reference.
+
+        Delegates to the same function the prediction endpoint uses, so the value
+        shown in the history table, the detail modal and the Excel export matches
+        the one shown on the result card. Returns None when the age falls outside
+        the 0-60 month reference or the row is incomplete.
+        """
+        from app.models.predictor import calculate_z_score
+
+        try:
+            # The reference table is keyed by whole months, 0-60.
+            months = int(round(self.umur))
+            if months < 0 or months > 60:
+                return None
+            return calculate_z_score(int(self.jenis_kelamin), self.tinggi_badan, months)
+        except (TypeError, ValueError, KeyError, ZeroDivisionError):
+            return None

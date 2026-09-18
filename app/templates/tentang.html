@@ -1,352 +1,115 @@
 {% extends "base.html" %}
+{% from '_macros.html' import icon, accordion_item, badge with context %}
+
+{% block title %}Tentang — Sistem Prediksi Stunting{% endblock %}
 
 {% block content %}
 
-<div class="h-screen app-shell flex overflow-hidden">
+{% set parameters = [
+    ('user',         'Jenis kelamin',      'Laki-laki atau perempuan'),
+    ('scale',        'Berat badan lahir',  'Dalam kilogram'),
+    ('calendar',     'Umur',               'Dalam bulan, 0-60'),
+    ('nutrition',    'Berat badan',        'Berat saat pemeriksaan, kilogram'),
+    ('ruler',        'Tinggi badan',       'Tinggi saat pemeriksaan, sentimeter'),
+    ('activity',     'Tinggi badan ibu',   'Faktor maternal, sentimeter')
+] %}
 
-    <!-- SIDEBAR -->
-    <aside class="w-72 app-sidebar border-r border-slate-200 h-screen overflow-y-auto hidden lg:flex flex-col">
+<header class="mb-10">
+    <h1 class="text-display">Tentang sistem</h1>
+    <p class="lede mt-4">
+        Skrining awal risiko stunting untuk anak usia 6&ndash;60 bulan, menggunakan regresi
+        logistik atas data antropometri anak dan satu faktor maternal.
+    </p>
+</header>
 
-        <div class="flex justify-end px-4 pt-3">
-            <button
-                type="button"
-                onclick="toggleTheme()"
-                aria-label="Ganti mode tampilan"
-                title="Ganti mode tampilan"
-                class="theme-toggle-btn w-8 h-8 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon theme-icon-moon"><use href="#icon-moon"></use></svg>
-                <svg class="ui-icon theme-icon-sun"><use href="#icon-sun"></use></svg>
-            </button>
-        </div>
+<div class="bento lg:grid-cols-3">
 
-        <!-- LOGO -->
-        <div class="px-8 pb-8 pt-2 border-b border-slate-100">
+    <section class="card card--ink p-7 lg:row-span-2" style="--i: 0">
+        <h2 class="card-title">Parameter prediksi</h2>
+        <p class="card-sub mb-6">Enam nilai yang masuk ke model.</p>
 
-            <div class="flex items-center gap-4">
-
-                <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl">
-                    <svg class="ui-icon"><use href="#icon-stethoscope"></use></svg>
+        <div class="checklist">
+            {% for icon_name, name, note in parameters %}
+                <div class="check-item">
+                    <span class="check-tile">{{ icon(icon_name, 'sm') }}</span>
+                    <div class="check-body">
+                        <p class="check-title">{{ name }}</p>
+                        <p class="check-meta">{{ note }}</p>
+                    </div>
                 </div>
+            {% endfor %}
+        </div>
+    </section>
 
-                <div>
+    <section class="card card--white p-7 lg:col-span-2" style="--i: 1">
+        <h2 class="card-title">Interpretasi Z-Score (TB/U)</h2>
+        <p class="card-sub mb-6">
+            Tinggi badan menurut umur dan jenis kelamin, dibandingkan dengan standar WHO.
+        </p>
 
-                    <h1 class="text-xl font-bold text-slate-800 leading-tight">
-                        Sistem Prediksi
-                    </h1>
-
-                    <p class="text-slate-500 text-sm">
-                        Stunting Dashboard
-                    </p>
-
-                </div>
-
-            </div>
-
+        <div class="stat-progress-pill-track meter--segmented meter--tall">
+            <div class="meter-seg meter-seg--ink" style="width: 22%">Berat</div>
+            <div class="meter-seg meter-seg--gold" style="width: 26%">Stunting</div>
+            <div class="meter-seg meter-seg--neutral" style="width: 52%">Normal</div>
         </div>
 
-        <!-- PROFILE -->
-        <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between gap-3">
-
-            <div>
-                <p class="text-sm text-slate-400">
-                    Login sebagai
-                </p>
-
-                <h3 class="font-semibold text-slate-800 mt-1">
-                    {{ fullname }}
-                </h3>
+        <div class="grid sm:grid-cols-3 gap-3 mt-5">
+            <div class="kv-tile">
+                <p class="kv-label">Stunting berat</p>
+                <p class="kv-value">&lt; &minus;3 SD</p>
             </div>
-
-            <a
-                href="/logout"
-                aria-label="Logout"
-                title="Logout"
-                class="w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon"><use href="#icon-logout"></use></svg>
-            </a>
-
+            <div class="kv-tile">
+                <p class="kv-label">Stunting</p>
+                <p class="kv-value">&minus;3 s.d. &minus;2 SD</p>
+            </div>
+            <div class="kv-tile">
+                <p class="kv-label">Normal</p>
+                <p class="kv-value">&ge; &minus;2 SD</p>
+            </div>
         </div>
+    </section>
 
-        <!-- NAVIGATION -->
-        <nav class="flex-1 px-5 py-6">
+    <section class="card card--white p-7" style="--i: 2">
+        <h2 class="card-title">Hasil prediksi</h2>
+        <p class="card-sub mb-5">Tiga angka yang dikembalikan setiap pemeriksaan.</p>
 
-            <p class="text-xs uppercase tracking-wider text-slate-400 px-3 mb-4">
-                Menu Utama
-            </p>
+        <div class="accordion">
+            {% call accordion_item('Hasil', open=True, icon_name='check-circle') %}
+                Normal atau Stunting, ditentukan oleh model regresi logistik.
+            {% endcall %}
+            {% call accordion_item('Probabilitas', icon_name='chart') %}
+                Tingkat keyakinan model terhadap hasil tersebut, dalam persen.
+            {% endcall %}
+            {% call accordion_item('Z-Score (TB/U)', icon_name='ruler') %}
+                Nilai tinggi badan menurut umur berdasarkan tabel rujukan WHO,
+                dihitung terpisah dari model.
+            {% endcall %}
+        </div>
+    </section>
 
-            <div class="space-y-2">
+    <section class="card card--white p-7" style="--i: 3">
+        <h2 class="card-title">Risiko dan jenis kelamin</h2>
+        <p class="card-sub mb-5">Mengapa model memperhitungkan jenis kelamin.</p>
 
-                <!-- DASHBOARD -->
-                <a
-                    href="/"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
+        <div class="accordion">
+            {% call accordion_item('Anak laki-laki', icon_name='user') %}
+                Cenderung berisiko lebih tinggi: kebutuhan energi dan laju pertumbuhannya
+                relatif lebih besar.
+            {% endcall %}
+            {% call accordion_item('Anak perempuan', icon_name='user') %}
+                Pertumbuhan umumnya lebih stabil, tetapi tetap berisiko bila kebutuhan gizi
+                dan kesehatan tidak terpenuhi.
+            {% endcall %}
+        </div>
+    </section>
 
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-dashboard"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Dashboard
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Statistik Sistem
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- PREDIKSI -->
-                <a
-                    href="/prediksi"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-chart"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Prediksi
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Prediksi Stunting
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- HISTORY -->
-                <a
-                    href="/history"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        <svg class="ui-icon"><use href="#icon-clipboard"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-medium">
-                            Riwayat
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Riwayat Prediksi
-                        </p>
-                    </div>
-
-                </a>
-
-                <!-- TENTANG -->
-                <a
-                    href="/tentang"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl bg-indigo-50 text-indigo-600 transition group"
-                >
-
-                    <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-lg">
-                        <svg class="ui-icon"><use href="#icon-info"></use></svg>
-                    </div>
-
-                    <div>
-                        <p class="font-semibold text-indigo-600">
-                            Tentang
-                        </p>
-
-                        <p class="text-xs text-slate-400">
-                            Tentang
-                        </p>
-                    </div>
-
-                </a>
-
-            </div>
-
-        </nav>
-
+    <aside class="card card--accent p-7 lg:col-span-3" style="--i: 4">
+        <h2 class="card-title flex items-center gap-2">{{ icon('info') }} Bukan diagnosis</h2>
+        <p class="prose-body mt-2" style="color: var(--text-1)">
+            Hasil sistem adalah alat bantu skrining awal. Keputusan klinis tetap dibuat oleh
+            tenaga kesehatan melalui pemeriksaan lanjutan sesuai standar pelayanan.
+        </p>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="app-main flex-1 h-screen overflow-y-auto">
-
-        <!-- MOBILE HEADER -->
-        <div class="lg:hidden bg-white border-b border-slate-200 px-6 py-5 flex items-center justify-between gap-4">
-
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800">
-                    Tentang Sistem
-                </h1>
-
-                <p class="text-slate-500 text-sm mt-1">
-                    Selamat datang, {{ fullname }}
-                </p>
-            </div>
-
-            <button
-                type="button"
-                onclick="toggleTheme()"
-                aria-label="Ganti mode tampilan"
-                title="Ganti mode tampilan"
-                class="theme-toggle-btn w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition"
-            >
-                <svg class="ui-icon theme-icon-moon"><use href="#icon-moon"></use></svg>
-                <svg class="ui-icon theme-icon-sun"><use href="#icon-sun"></use></svg>
-            </button>
-
-        </div>
-
-        <!-- PAGE CONTENT -->
-        <div class="p-6 lg:p-10">
-
-            <div class="mb-10">
-
-                <div class="hero-panel about-panel rounded-3xl p-8 shadow-sm">
-
-                    <div class="flex items-start gap-5">
-
-                        <div class="w-16 h-16 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-3xl shrink-0">
-                            <svg class="ui-icon"><use href="#icon-chart"></use></svg>
-                        </div>
-
-                        <div>
-
-                            <h2 class="text-2xl font-bold text-slate-800 mb-4">
-                                Tentang Sistem
-                            </h2>
-
-                            <p class="leading-relaxed text-slate-600">
-                                Sistem Prediksi Stunting merupakan aplikasi berbasis web yang dirancang
-                                untuk membantu tenaga kesehatan melakukan skrining awal risiko stunting
-                                pada anak usia <b>6–60 bulan</b>. Sistem menggunakan algoritma
-                                <b>Regresi Logistik</b> untuk menghasilkan prediksi berdasarkan data
-                                antropometri anak dan faktor maternal sehingga proses penilaian dapat
-                                dilakukan secara cepat sebagai pendukung pengambilan keputusan.
-                            </p>
-
-                            <!-- PARAMETER -->
-                            <div class="mt-6">
-
-                                <h3 class="font-bold text-slate-800 mb-2">
-                                    Parameter Prediksi
-                                </h3>
-
-                                <p class="mb-3 text-slate-600">
-                                    Sistem melakukan prediksi menggunakan beberapa parameter berikut:
-                                </p>
-
-                                <ul class="list-disc pl-5 space-y-2 text-slate-600">
-                                    <li>Jenis Kelamin</li>
-                                    <li>Berat Badan Lahir</li>
-                                    <li>Umur</li>
-                                    <li>Berat Badan</li>
-                                    <li>Tinggi Badan</li>
-                                    <li>Lingkar Lengan Atas (LILA)</li>
-                                    <li>Tinggi Badan Ibu</li>
-                                </ul>
-
-                            </div>
-
-                            <!-- HASIL -->
-                            <div class="mt-6">
-
-                                <h3 class="font-bold text-slate-800 mb-2">
-                                    Hasil Prediksi
-                                </h3>
-
-                                <p class="mb-3 text-slate-600">
-                                    Sistem menampilkan tiga informasi utama yang digunakan sebagai
-                                    dasar skrining pertumbuhan anak.
-                                </p>
-
-                                <ul class="list-disc pl-5 space-y-2 text-slate-600">
-                                    <li><b>Hasil Prediksi</b> : Normal atau Stunting.</li>
-                                    <li><b>Probabilitas</b> : Tingkat keyakinan model terhadap hasil prediksi.</li>
-                                    <li><b>Z-Score (TB/U)</b> : Nilai tinggi badan menurut umur berdasarkan standar WHO.</li>
-                                </ul>
-
-                            </div>
-
-                            <!-- Z SCORE -->
-                            <div class="mt-6">
-
-                                <h3 class="font-bold text-slate-800 mb-2">
-                                    Interpretasi Z-Score (TB/U)
-                                </h3>
-
-                                <p class="mb-3 text-slate-600">
-                                    Z-Score merupakan indikator pertumbuhan anak berdasarkan standar
-                                    WHO yang membandingkan tinggi badan menurut umur dan jenis kelamin.
-                                </p>
-
-                                <ul class="list-disc pl-5 space-y-2 text-slate-600">
-                                    <li><b>Normal</b> : ≥ -2 SD</li>
-                                    <li><b>Stunting</b> : &lt; -2 SD sampai ≥ -3 SD</li>
-                                    <li><b>Stunting Berat</b> : &lt; -3 SD</li>
-                                </ul>
-
-                            </div>
-
-                            <!-- GENDER -->
-                            <div class="mt-6">
-
-                                <h3 class="font-bold text-slate-800 mb-2">
-                                    Perbedaan Risiko Berdasarkan Jenis Kelamin
-                                </h3>
-
-                                <ul class="list-disc pl-5 space-y-2 text-slate-600">
-
-                                    <li>
-                                        <b>Anak laki-laki</b> memiliki kecenderungan risiko stunting
-                                        yang lebih tinggi karena kebutuhan energi dan laju
-                                        pertumbuhannya relatif lebih besar.
-                                    </li>
-
-                                    <li>
-                                        <b>Anak perempuan</b> umumnya memiliki pertumbuhan yang lebih
-                                        stabil, namun tetap berisiko mengalami stunting apabila
-                                        kebutuhan gizi dan kesehatannya tidak terpenuhi.
-                                    </li>
-
-                                </ul>
-
-                            </div>
-
-                            <!-- CATATAN -->
-                            <div class="mt-6 p-5 rounded-2xl bg-indigo-50 border border-indigo-100">
-
-                                <h3 class="font-bold text-indigo-700 mb-2 flex items-center gap-2">
-                                    <svg class="ui-icon"><use href="#icon-info"></use></svg>
-                                    Catatan
-                                </h3>
-
-                                <p class="leading-relaxed text-indigo-600">
-                                    Hasil prediksi yang diberikan sistem merupakan
-                                    <b>alat bantu skrining awal</b> dan
-                                    <b>bukan diagnosis medis</b>. Keputusan klinis tetap harus
-                                    dilakukan oleh tenaga kesehatan melalui pemeriksaan lanjutan sesuai
-                                    standar pelayanan kesehatan.
-                                </p>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
 </div>
-
 {% endblock %}

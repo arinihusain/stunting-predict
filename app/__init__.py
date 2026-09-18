@@ -17,6 +17,11 @@ def create_app():
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
 
+    # Shared template globals (fullname, asset_v)
+    from app.utils.context import register_context
+
+    register_context(app)
+
     with app.app_context():
         db.create_all()
 

@@ -1,0 +1,190 @@
+{# =============================================================================
+   Shared UI macros.
+
+   Import per page — Jinja binds imported names in the importing template's
+   namespace, so they are NOT inherited through {% extends %}:
+
+       {% from '_macros.html' import card, field, badge with context %}
+
+   `with context` is mandatory: field() and empty_state() reach for url_for.
+   ========================================================================== #}
+
+
+{# Icon from the sprite in _icons.html. `size` is a Tailwind font-size step,
+   because .ui-icon is 1em square. #}
+{% macro icon(name, size='base', cls='') -%}
+<svg class="ui-icon text-{{ size }} {{ cls }}" aria-hidden="true"><use href="#icon-{{ name }}"></use></svg>
+{%- endmacro %}
+
+
+{# The bento primitive. variant: white | cream | ink #}
+{% macro card(variant='white', pad='p-6', cls='', tag='div') -%}
+<{{ tag }} class="card card--{{ variant }} {{ pad }} {{ cls }}">{{ caller() if caller else '' }}</{{ tag }}>
+{%- endmacro %}
+
+
+{# Card title, optional subtitle, and the small circular corner action. #}
+{% macro card_head(title, subtitle=None, action_href=None, action_icon='arrow-up-right', action_label=None, level=3) -%}
+<div class="card-head">
+    <div>
+        <h{{ level }} class="card-title">{{ title }}</h{{ level }}>
+        {% if subtitle %}<p class="card-sub">{{ subtitle }}</p>{% endif %}
+    </div>
+    {% if action_href %}
+        <a href="{{ action_href }}" class="card-action" aria-label="{{ action_label or title }}">
+            {{ icon(action_icon, 'sm') }}
+        </a>
+    {% endif %}
+</div>
+{%- endmacro %}
+
+
+{# Text / number input. Replaces the inline oninvalid+oninput attribute pairs:
+   the message travels as data-msg and app.js renders it into .field-error. #}
+{% macro field(name, label, type='text', value='', placeholder='', required=True,
+               step=None, min=None, max=None, maxlength=None, inputmode=None,
+               autocomplete=None, msg=None, hint=None, unit=None, affix=None,
+               autofocus=False) -%}
+<div class="field" data-field="{{ name }}">
+    <label class="field-label" for="f-{{ name }}">
+        {{ label }}{% if unit %} <span class="field-unit">({{ unit }})</span>{% endif %}
+    </label>
+    <div class="field-control">
+        <input id="f-{{ name }}" name="{{ name }}" type="{{ type }}" class="input"
+               value="{{ value }}" placeholder="{{ placeholder }}"
+               {% if required %}required{% endif %}
+               {% if step is not none %}step="{{ step }}"{% endif %}
+               {% if min is not none %}min="{{ min }}"{% endif %}
+               {% if max is not none %}max="{{ max }}"{% endif %}
+               {% if maxlength %}maxlength="{{ maxlength }}"{% endif %}
+               {% if inputmode %}inputmode="{{ inputmode }}"{% endif %}
+               {% if autocomplete %}autocomplete="{{ autocomplete }}"{% endif %}
+               {% if autofocus %}autofocus{% endif %}
+               {% if hint %}aria-describedby="h-{{ name }}"{% endif %}
+               data-msg="{{ msg or (label ~ ' wajib diisi.') }}">
+        {% if affix %}<span class="field-affix">{{ affix }}</span>{% endif %}
+        {{ caller() if caller else '' }}
+    </div>
+    {% if hint %}<p class="hint" id="h-{{ name }}">{{ hint }}</p>{% endif %}
+    <p class="field-error" data-error hidden></p>
+</div>
+{%- endmacro %}
+
+
+{# Select. `options` is a list of (value, label) pairs. #}
+{% macro select_field(name, label, options, selected=None, required=True, placeholder=None, msg=None) -%}
+<div class="field" data-field="{{ name }}">
+    <label class="field-label" for="f-{{ name }}">{{ label }}</label>
+    <div class="field-control">
+        <select id="f-{{ name }}" name="{{ name }}" class="select"
+                {% if required %}required{% endif %}
+                data-msg="{{ msg or (label ~ ' wajib dipilih.') }}">
+            {% if placeholder %}<option value="" {{ 'selected' if selected is none }}>{{ placeholder }}</option>{% endif %}
+            {% for value, text in options %}
+                <option value="{{ value }}" {{ 'selected' if selected is not none and selected|string == value|string }}>{{ text }}</option>
+            {% endfor %}
+        </select>
+        <span class="select-chevron">{{ icon('chevron-down', 'sm') }}</span>
+    </div>
+    <p class="field-error" data-error hidden></p>
+</div>
+{%- endmacro %}
+
+
+{# tone: risk | safe | neutral | accent | ink | outline | danger.
+   Templates name a tone, never a colour, so dark mode flips in one place. #}
+{% macro badge(text, tone='neutral', icon_name=None, size='md') -%}
+<span class="badge badge--{{ tone }} badge--{{ size }}">
+    {%- if icon_name %}{{ icon(icon_name, 'sm') }}{% endif -%}
+    {{ text }}
+</span>
+{%- endmacro %}
+
+
+{# The big light-weight number with a tiny icon+label beneath. #}
+{% macro stat(value, label, icon_name=None, suffix='', tone='ink') -%}
+<div class="stat stat--{{ tone }}">
+    <p class="stat-value">{{ value }}{% if suffix %}<span class="stat-suffix">{{ suffix }}</span>{% endif %}</p>
+    <p class="stat-label">{% if icon_name %}{{ icon(icon_name, 'xs') }}{% endif %}{{ label }}</p>
+</div>
+{%- endmacro %}
+
+
+{# Single-value pill meter. The hatched track reads as "no data yet". #}
+{% macro pill_progress(pct, tone='gold', label=None, value=None, hatch=True) -%}
+{% if label or value is not none %}
+<div class="meter-head">
+    <span>{{ label or '' }}</span>
+    <span class="meter-value">{{ value if value is not none else pct ~ '%' }}</span>
+</div>
+{% endif %}
+<div class="stat-progress-pill-track {{ 'stat-progress-pill-track--hatch' if hatch }}"
+     role="progressbar" aria-valuenow="{{ pct }}" aria-valuemin="0" aria-valuemax="100"
+     {% if label %}aria-label="{{ label }}"{% endif %}>
+    <div class="stat-progress-pill-fill stat-progress-pill-fill--{{ tone }}" style="width: {{ pct }}%"></div>
+</div>
+{%- endmacro %}
+
+
+{# Multi-part meter. `segments` is a list of (pct, tone, inline_label) triples;
+   a trailing hatched segment fills whatever percentage is left over. #}
+{% macro segmented_progress(segments, tall=False, fill_rest=True) -%}
+<div class="stat-progress-pill-track meter--segmented {{ 'meter--tall' if tall }}">
+    {% for pct, tone, text in segments %}
+        <div class="meter-seg meter-seg--{{ tone }}" style="width: {{ pct }}%">{{ text or '' }}</div>
+    {% endfor %}
+    {% if fill_rest %}<div class="meter-seg meter-seg--hatch"></div>{% endif %}
+</div>
+{%- endmacro %}
+
+
+{# Conic-gradient arc with an optional tick-mark bezel. #}
+{% macro progress_ring(pct, value_label, caption, ticks=True, size='') -%}
+<div class="progress-ring {{ 'progress-ring--' ~ size if size }} {{ 'progress-ring--ticks' if ticks }}"
+     style="--pct: {{ pct }};" role="img" aria-label="{{ caption }}: {{ value_label }}">
+    <div class="progress-ring-inner">
+        <span class="ring-value" data-slot="ring-value">{{ value_label }}</span>
+        <span class="ring-caption">{{ caption }}</span>
+    </div>
+</div>
+{%- endmacro %}
+
+
+{# Native details/summary — keyboard-accessible with no JavaScript. #}
+{% macro accordion_item(title, open=False, icon_name=None) -%}
+<details class="accordion-item" {{ 'open' if open }}>
+    <summary class="accordion-trigger">
+        <span class="accordion-title">{% if icon_name %}{{ icon(icon_name) }}{% endif %}{{ title }}</span>
+        {{ icon('chevron-down', 'base', 'accordion-chevron') }}
+    </summary>
+    <div class="accordion-panel">{{ caller() }}</div>
+</details>
+{%- endmacro %}
+
+
+{# An empty screen is an invitation to act, so it takes a CTA where one exists. #}
+{% macro empty_state(icon_name, title, body, cta_label=None, cta_href=None) -%}
+<div class="empty-state">
+    <div class="empty-state-icon">{{ icon(icon_name, 'xl') }}</div>
+    <h3 class="empty-state-title">{{ title }}</h3>
+    <p class="empty-state-body">{{ body }}</p>
+    {% if cta_label and cta_href %}
+        <a href="{{ cta_href }}" class="btn btn--primary mt-5">{{ cta_label }}</a>
+    {% endif %}
+</div>
+{%- endmacro %}
+
+
+{# Row in a dark checklist card. state: done | risk | pending #}
+{% macro check_item(title, meta, icon_name='activity', state='pending') -%}
+<div class="check-item">
+    <span class="check-tile">{{ icon(icon_name, 'sm') }}</span>
+    <div class="check-body">
+        <p class="check-title">{{ title }}</p>
+        <p class="check-meta">{{ meta }}</p>
+    </div>
+    <span class="check-circle {{ 'check-circle--' ~ state if state != 'pending' }}">
+        {%- if state == 'done' %}{{ icon('check', 'xs') }}{% elif state == 'risk' %}{{ icon('warning', 'xs') }}{% endif -%}
+    </span>
+</div>
+{%- endmacro %}

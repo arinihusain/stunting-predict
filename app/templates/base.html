@@ -1,28 +1,38 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Sistem Prediksi Stunting</title>
+    {# Must be the first executing element: it applies the stored theme before paint. #}
+    <script>{% include '_theme_init.js' %}</script>
+
+    <title>{% block title %}Sistem Prediksi Stunting{% endblock %}</title>
+    <meta name="description" content="Sistem prediksi risiko stunting pada anak berdasarkan data antropometri.">
 
     {% include '_theme.html' %}
+    {% block head %}{% endblock %}
 </head>
-<body class="text-slate-800">
+
+<body class="{% block body_class %}app-shell{% endblock %}">
+
+    <div class="page-glow" aria-hidden="true"></div>
 
     {% include '_icons.html' %}
 
-    <script>
-        function toggleTheme() {
-            var root = document.documentElement;
-            var dark = root.classList.toggle('dark');
-            localStorage.setItem('theme', dark ? 'dark' : 'light');
-            document.dispatchEvent(new CustomEvent('themechange', { detail: { dark: dark } }));
-        }
-    </script>
+    <a href="#main" class="skip-link">Lewati ke konten</a>
 
-    {% block content %}
-    {% endblock %}
+    {% block chrome %}{% include '_topnav.html' %}{% endblock %}
 
+    <main id="main" class="{% block main_class %}shell{% endblock %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% block page_data %}{% endblock %}
+
+    <script defer src="{{ url_for('static', filename='js/app.js', v=asset_v) }}"></script>
+    {% block scripts %}{% endblock %}
 </body>
+
 </html>
