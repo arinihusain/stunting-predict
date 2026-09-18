@@ -19,18 +19,31 @@
 
 </style>
 
-<div class="min-h-screen bg-slate-50 flex">
+<div class="h-screen app-shell flex overflow-hidden">
 
     <!-- SIDEBAR -->
-    <aside class="w-72 bg-white border-r border-slate-200 min-h-screen sticky top-0 hidden lg:flex flex-col">
+    <aside class="w-72 app-sidebar border-r border-slate-200 h-screen overflow-y-auto hidden lg:flex flex-col">
+
+        <div class="flex justify-end px-4 pt-3">
+            <button
+                type="button"
+                onclick="toggleTheme()"
+                aria-label="Ganti mode tampilan"
+                title="Ganti mode tampilan"
+                class="theme-toggle-btn w-8 h-8 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition"
+            >
+                <svg class="ui-icon theme-icon-moon"><use href="#icon-moon"></use></svg>
+                <svg class="ui-icon theme-icon-sun"><use href="#icon-sun"></use></svg>
+            </button>
+        </div>
 
         <!-- LOGO -->
-        <div class="px-8 py-8 border-b border-slate-100">
+        <div class="px-8 pb-8 pt-2 border-b border-slate-100">
 
             <div class="flex items-center gap-4">
 
-                <div class="w-14 h-14 rounded-2xl bg-indigo-100 flex items-center justify-center text-2xl">
-                    🩺
+                <div class="w-14 h-14 rounded-2xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl">
+                    <svg class="ui-icon"><use href="#icon-stethoscope"></use></svg>
                 </div>
 
                 <div>
@@ -50,15 +63,26 @@
         </div>
 
         <!-- PROFILE -->
-        <div class="px-8 py-6 border-b border-slate-100">
+        <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between gap-3">
 
-            <p class="text-sm text-slate-400">
-                Login sebagai
-            </p>
+            <div>
+                <p class="text-sm text-slate-400">
+                    Login sebagai
+                </p>
 
-            <h3 class="font-semibold text-slate-800 mt-1">
-                {{ fullname }}
-            </h3>
+                <h3 class="font-semibold text-slate-800 mt-1">
+                    {{ fullname }}
+                </h3>
+            </div>
+
+            <a
+                href="/logout"
+                aria-label="Logout"
+                title="Logout"
+                class="w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:bg-red-50 hover:text-red-600 flex items-center justify-center transition"
+            >
+                <svg class="ui-icon"><use href="#icon-logout"></use></svg>
+            </a>
 
         </div>
 
@@ -78,7 +102,7 @@
                 >
 
                     <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        🏠
+                        <svg class="ui-icon"><use href="#icon-dashboard"></use></svg>
                     </div>
 
                     <div>
@@ -100,7 +124,7 @@
                 >
 
                     <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
-                        📈
+                        <svg class="ui-icon"><use href="#icon-chart"></use></svg>
                     </div>
 
                     <div>
@@ -118,11 +142,11 @@
                 <!-- HISTORY -->
                 <a
                     href="/history"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl bg-blue-50 text-blue-600 transition group"
+                    class="flex items-center gap-4 px-4 py-4 rounded-2xl bg-indigo-50 text-indigo-600 transition group"
                 >
 
-                    <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-lg">
-                        📋
+                    <div class="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center text-lg">
+                        <svg class="ui-icon"><use href="#icon-clipboard"></use></svg>
                     </div>
 
                     <div>
@@ -130,7 +154,7 @@
                             Riwayat
                         </p>
 
-                        <p class="text-xs text-blue-400">
+                        <p class="text-xs text-slate-400">
                             Riwayat Prediksi
                         </p>
                     </div>
@@ -140,11 +164,11 @@
                 <!-- TENTANG -->
                 <a
                     href="/tentang"
-                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition group"
+                    class="flex items-center gap-4 px-4 py-4 rounded-2xl text-slate-600 hover:bg-indigo-50 hover:text-indigo-600 transition group"
                 >
 
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center text-lg transition">
-                        ⚙️
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 group-hover:bg-indigo-100 flex items-center justify-center text-lg transition">
+                        <svg class="ui-icon"><use href="#icon-info"></use></svg>
                     </div>
 
                     <div>
@@ -163,34 +187,34 @@
 
         </nav>
 
-        <!-- FOOTER -->
-        <div class="p-5 border-t border-slate-100">
-
-            <a
-                href="/logout"
-                class="flex items-center justify-center gap-3 w-full px-4 py-4 rounded-2xl bg-red-50 text-red-600 hover:bg-red-100 transition font-medium"
-            >
-                <span>🚪</span>
-                Logout
-            </a>
-
-        </div>
-
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1">
+    <main class="app-main flex-1 h-screen overflow-y-auto">
 
         <!-- MOBILE HEADER -->
-        <div class="lg:hidden bg-white border-b border-slate-200 px-6 py-5">
+        <div class="lg:hidden bg-white border-b border-slate-200 px-6 py-5 flex items-center justify-between gap-4">
 
-            <h1 class="text-2xl font-bold text-slate-800">
-                Riwayat Prediksi
-            </h1>
+            <div>
+                <h1 class="text-2xl font-bold text-slate-800">
+                    Riwayat Prediksi
+                </h1>
 
-            <p class="text-slate-500 text-sm mt-1">
-                Selamat datang, {{ fullname }}
-            </p>
+                <p class="text-slate-500 text-sm mt-1">
+                    Selamat datang, {{ fullname }}
+                </p>
+            </div>
+
+            <button
+                type="button"
+                onclick="toggleTheme()"
+                aria-label="Ganti mode tampilan"
+                title="Ganti mode tampilan"
+                class="theme-toggle-btn w-8 h-8 shrink-0 rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 flex items-center justify-center transition"
+            >
+                <svg class="ui-icon theme-icon-moon"><use href="#icon-moon"></use></svg>
+                <svg class="ui-icon theme-icon-sun"><use href="#icon-sun"></use></svg>
+            </button>
 
         </div>
 
@@ -200,12 +224,12 @@
             <!-- HERO -->
             <div class="mb-8">
 
-                <div class="bg-gradient-to-r from-indigo-500 to-blue-500 rounded-3xl p-8 text-white shadow-sm">
+                <div class="hero-panel rounded-3xl p-8 shadow-sm">
 
                     <div class="flex items-center gap-5">
 
                         <div class="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center text-3xl">
-                            📋
+                            <svg class="ui-icon"><use href="#icon-clipboard"></use></svg>
                         </div>
 
                         <div>
@@ -214,7 +238,7 @@
                                 Data Riwayat Prediksi
                             </h2>
 
-                            <p class="text-indigo-100 mt-2 leading-relaxed">
+                            <p class="text-white/80 mt-2 leading-relaxed">
                                 Sistem menyimpan seluruh hasil prediksi risiko
                                 stunting untuk membantu tenaga kesehatan melakukan
                                 monitoring dan evaluasi data anak.
@@ -229,11 +253,11 @@
             </div>
 
             <!-- TABLE CARD -->
-            <div class="bg-white animate-[fadeIn_.25s_ease] rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+            <div class="surface-card bg-white animate-[fadeIn_.25s_ease] rounded-3xl overflow-hidden">
 
                 <!-- TOP -->
                 <div class="px-8 py-6 border-b border-slate-100 flex items-center justify-between">
-    
+
                     <div class="flex items-center gap-3">
 
                         <a
@@ -249,7 +273,7 @@
                                 font-medium
                             "
                         >
-                            <span>📥</span>
+                            <svg class="ui-icon"><use href="#icon-download"></use></svg>
                             Export Excel
                         </a>
 
@@ -273,7 +297,7 @@
 
                     <table class="w-full min-w-[900px]">
 
-                        <thead class="bg-slate-100 text-slate-700">
+                        <thead class="bg-slate-50 text-slate-700">
 
                             <tr>
                                 <th class="text-left px-6 py-4 font-semibold">
@@ -338,14 +362,16 @@
 
                                         {% if item.prediction == 'Stunting' %}
 
-                                        <span class="px-4 py-2 rounded-full bg-amber-100 text-amber-700 text-sm font-semibold">
-                                            ⚠️ Stunting
+                                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-100 text-amber-700 text-sm font-semibold">
+                                            <svg class="ui-icon"><use href="#icon-warning"></use></svg>
+                                            Stunting
                                         </span>
 
                                         {% else %}
 
-                                        <span class="px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold">
-                                            ✅ Normal
+                                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-semibold">
+                                            <svg class="ui-icon"><use href="#icon-check"></use></svg>
+                                            Normal
                                         </span>
 
                                         {% endif %}
@@ -440,9 +466,10 @@
 
                                         <button
                                             onclick="deleteHistory({{ item.id }})"
+                                            aria-label="Hapus riwayat prediksi"
                                             class="w-11 h-11 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition flex items-center justify-center"
                                         >
-                                            🗑️
+                                            <svg class="ui-icon text-lg"><use href="#icon-trash"></use></svg>
                                         </button>
 
                                     </td>
@@ -460,8 +487,8 @@
 
                                     <div class="max-w-md mx-auto">
 
-                                        <div class="w-24 h-24 mx-auto rounded-3xl bg-slate-100 flex items-center justify-center text-5xl mb-6">
-                                            📂
+                                        <div class="w-24 h-24 mx-auto rounded-3xl bg-slate-100 text-slate-400 flex items-center justify-center text-5xl mb-6">
+                                            <svg class="ui-icon"><use href="#icon-folder"></use></svg>
                                         </div>
 
                                         <h3 class="text-2xl font-bold text-slate-800">
@@ -475,7 +502,7 @@
                                         </p>
 
                                         <a
-                                            href="/"
+                                            href="/prediksi"
                                             class="inline-flex items-center mt-8 px-6 py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 text-white font-semibold transition"
                                         >
                                             Mulai Prediksi
@@ -533,7 +560,7 @@
         <div class="
             flex items-center justify-between
             mb-8
-            sticky 
+            sticky
             bg-white
             pb-4
             z-10
@@ -553,9 +580,10 @@
 
             <button
                 onclick="closeDetail()"
-                class="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 transition"
+                aria-label="Tutup detail prediksi"
+                class="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition flex items-center justify-center"
             >
-                ✕
+                <svg class="ui-icon text-lg"><use href="#icon-close"></use></svg>
             </button>
 
         </div>
@@ -652,8 +680,8 @@ function openDetail(
 
             <div class="flex items-center gap-3 mb-4">
 
-                <div class="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center">
-                    🥗
+                <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                    <svg class="ui-icon text-xl"><use href="#icon-nutrition"></use></svg>
                 </div>
 
                 <div>
@@ -694,9 +722,9 @@ function openDetail(
                 `
                 :
                 `
-                <div class="rounded-xl bg-blue-50 border border-blue-200 p-4">
+                <div class="rounded-xl bg-emerald-50 border border-emerald-200 p-4">
 
-                    <ul class="list-disc pl-5 space-y-2 text-sm text-blue-900">
+                    <ul class="list-disc pl-5 space-y-2 text-sm text-emerald-900">
 
                         <li>Pertahankan pola makan bergizi seimbang sesuai pedoman Isi Piringku.</li>
 

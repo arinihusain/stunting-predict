@@ -60,8 +60,10 @@ Aplikasi web Flask untuk prediksi risiko stunting pada anak.
 7. Buka browser ke:
 
    ```
-   http://127.0.0.1:5000
+   http://127.0.0.1:5001
    ```
+
+   > Catatan: port default diubah ke `5001` karena port `5000` sering di-reserve oleh Windows (Hyper-V/WSL) sehingga menyebabkan error `An attempt was made to access a socket in a way forbidden by its access permissions`. Kalau di komputer kamu port `5000` bebas, boleh dikembalikan di `run.py`.
 
 ## Struktur Singkat
 

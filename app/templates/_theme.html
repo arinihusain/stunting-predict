@@ -1,0 +1,39 @@
+<!-- Shared typography and clinical color system. -->
+<script>
+    (function () {
+        var stored = localStorage.getItem('theme');
+        var isDark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (isDark) document.documentElement.classList.add('dark');
+    })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+        darkMode: 'class',
+        theme: {
+            extend: {
+                colors: {
+                    indigo: {
+                        50: '#eef8f6', 100: '#d5eeea', 200: '#acdcd4',
+                        300: '#78c4b9', 400: '#32988b', 500: '#0f766e',
+                        600: '#0b655e', 700: '#0b554f', 800: '#104740', 900: '#123b36'
+                    },
+                    blue: {
+                        50: '#eff6fa', 100: '#dcebf3', 200: '#b9d6e6',
+                        300: '#8bb6cf', 400: '#5688a7', 500: '#356b8c',
+                        600: '#2c5b78', 700: '#264c64', 800: '#244155', 900: '#223747'
+                    },
+                    slate: {
+                        50: '#f5f9fa', 100: '#eaf1f3', 200: '#d8e4e7',
+                        300: '#b7cace', 400: '#637e86', 500: '#526770',
+                        600: '#405962', 700: '#2b4852', 800: '#18343b', 900: '#11272e'
+                    }
+                }
+            }
+        }
+    };
+</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/theme.css') }}">

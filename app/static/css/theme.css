@@ -1,0 +1,424 @@
+/* Clinical design tokens and component polish. Loaded after Tailwind. */
+:root {
+    --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, sans-serif;
+    --ink-900: #11272e;
+    --ink-800: #18343b;
+    --ink-500: #526770;
+    --teal-700: #0b554f;
+    --teal-600: #0b655e;
+    --teal-500: #0f766e;
+    --blue-700: #264c64;
+    --surface: rgba(250, 253, 252, 0.74);
+    --border-frost: rgba(250, 253, 252, 0.62);
+    --border-soft: rgba(24, 52, 59, 0.08);
+    --shadow-card: 0 1px 2px rgba(17, 39, 46, 0.04), 0 12px 32px -16px rgba(17, 39, 46, 0.16);
+    --shadow-frost: 0 1px 2px rgba(17, 39, 46, 0.03), 0 16px 40px -20px rgba(17, 39, 46, 0.14);
+}
+
+html {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+body {
+    font-family: var(--font-body);
+    color: var(--ink-800);
+    background-color: #f4faf8;
+    min-height: 100vh;
+}
+
+/* Ambient glow: a soft teal-mint highlight (top-right) paired with a
+   fainter blue echo (bottom-left) over a cool-white gradient, so the glow
+   harmonizes with the brand teal/blue instead of contrasting against it.
+   Static (no drift); still on a fixed pseudo-element so it never reflows
+   with content. */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+        radial-gradient(64rem 52rem at 84% -10%, rgba(94, 179, 165, 0.5), transparent 72%),
+        radial-gradient(48rem 40rem at 6% 108%, rgba(44, 91, 120, 0.22), transparent 70%),
+        linear-gradient(180deg, #fbfffd 0%, #f4faf8 55%, #eef6f3 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+}
+
+/* Scale the glow down on small screens so it stays proportionate */
+@media (max-width: 640px) {
+    body::before {
+        background-image:
+            radial-gradient(32rem 28rem at 86% -8%, rgba(94, 179, 165, 0.5), transparent 72%),
+            radial-gradient(26rem 22rem at 4% 104%, rgba(44, 91, 120, 0.22), transparent 70%),
+            linear-gradient(180deg, #fbfffd 0%, #f4faf8 55%, #eef6f3 100%);
+    }
+}
+
+h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: var(--font-display);
+    letter-spacing: -0.011em;
+}
+
+/* Icon sprite usage */
+.ui-icon {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    vertical-align: -0.125em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex: none;
+}
+
+/* Frosted app shell surfaces */
+.app-sidebar {
+    background: linear-gradient(180deg, rgba(250, 253, 252, 0.86), rgba(250, 253, 252, 0.74));
+    backdrop-filter: blur(18px) saturate(1.35);
+    -webkit-backdrop-filter: blur(18px) saturate(1.35);
+    border-right: 1px solid var(--border-frost);
+    box-shadow: 1px 0 0 rgba(17, 39, 46, 0.02);
+}
+
+.app-main > .lg\:hidden {
+    background: rgba(250, 253, 252, 0.78);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
+}
+
+/* Primary gradient panels (hero banners) */
+.hero-panel {
+    position: relative;
+    overflow: hidden;
+    color: #f2fbf9;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background:
+        radial-gradient(120% 160% at 100% 0%, rgba(84, 168, 158, 0.32), transparent 55%),
+        radial-gradient(34rem 34rem at -8% 118%, rgba(16, 122, 128, 0.35), transparent 62%),
+        linear-gradient(115deg, #0b554f 0%, #0f766e 52%, #2c5b78 100%);
+    box-shadow: 0 20px 45px -22px rgba(11, 85, 79, 0.55);
+}
+
+.hero-panel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(26rem 26rem at 88% -30%, rgba(255, 255, 255, 0.16), transparent 60%),
+        radial-gradient(18rem 18rem at -10% 130%, rgba(255, 255, 255, 0.1), transparent 60%);
+}
+
+.hero-panel > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Long-form about panel: readable white frosted card instead of gradient */
+.hero-panel.about-panel {
+    color: var(--ink-800);
+    border: 1px solid rgba(250, 253, 252, 0.65);
+    background:
+        radial-gradient(30rem 30rem at 100% 0%, rgba(15, 118, 110, 0.08), transparent 60%),
+        radial-gradient(26rem 26rem at -10% 110%, rgba(53, 107, 140, 0.07), transparent 60%),
+        linear-gradient(180deg, rgba(250, 253, 252, 0.88), rgba(250, 253, 252, 0.78));
+    backdrop-filter: blur(10px) saturate(1.25);
+    -webkit-backdrop-filter: blur(10px) saturate(1.25);
+    box-shadow: var(--shadow-frost);
+}
+
+.hero-panel.about-panel b {
+    color: var(--teal-700);
+}
+
+/* Cards keep Tailwind bg-white; subtle frost lift + softer borders */
+.surface-card {
+    border-color: var(--border-soft) !important;
+    box-shadow: var(--shadow-card) !important;
+}
+
+/* Sidebar nav tiles: calmer idle state, teal active */
+.app-sidebar nav a {
+    border: 1px solid transparent;
+    transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.app-sidebar nav a:hover {
+    background-color: rgba(15, 118, 110, 0.06) !important;
+    color: var(--teal-600) !important;
+}
+
+.app-sidebar nav a:hover .w-10 {
+    background-color: rgba(15, 118, 110, 0.12) !important;
+}
+
+/* Buttons and inputs keep Tailwind colors from remapped palettes */
+input:focus, select:focus {
+    caret-color: var(--teal-500);
+}
+
+::selection {
+    background: rgba(15, 118, 110, 0.18);
+}
+
+/* Chart.js theming */
+#monthlyChart {
+    font-family: var(--font-body);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+    }
+}
+
+/* ==========================================================================
+   Dark mode
+   Toggled via the "dark" class on <html> (see toggleTheme() in base.html).
+   Utility classes below are literal Tailwind class names produced by the
+   remapped indigo/blue/slate palette in _theme.html, overridden here rather
+   than touched per-template so every existing page picks up dark mode.
+   ========================================================================== */
+
+html.dark {
+    color-scheme: dark;
+    --dark-bg-0: #0b1412;
+    --dark-bg-1: #142320;
+    --dark-bg-2: #1b2b27;
+    --dark-border: rgba(255, 255, 255, 0.09);
+    --dark-text-strong: #eef4f2;
+    --dark-text: #c9d6d1;
+    --dark-text-muted: #8ea39c;
+}
+
+html.dark body {
+    background-color: var(--dark-bg-0);
+    color: var(--dark-text);
+}
+
+html.dark body::before {
+    background-image:
+        radial-gradient(64rem 52rem at 84% -10%, rgba(15, 118, 110, 0.35), transparent 72%),
+        radial-gradient(48rem 40rem at 6% 108%, rgba(44, 91, 120, 0.28), transparent 70%),
+        linear-gradient(180deg, #0d1815 0%, #0b1412 55%, #0a1210 100%);
+}
+
+@media (max-width: 640px) {
+    html.dark body::before {
+        background-image:
+            radial-gradient(32rem 28rem at 86% -8%, rgba(15, 118, 110, 0.35), transparent 72%),
+            radial-gradient(26rem 22rem at 4% 104%, rgba(44, 91, 120, 0.28), transparent 70%),
+            linear-gradient(180deg, #0d1815 0%, #0b1412 55%, #0a1210 100%);
+    }
+}
+
+html.dark .app-sidebar {
+    background: linear-gradient(180deg, rgba(20, 35, 32, 0.92), rgba(20, 35, 32, 0.82));
+    border-right-color: rgba(255, 255, 255, 0.06);
+    box-shadow: 1px 0 0 rgba(0, 0, 0, 0.2);
+}
+
+html.dark .app-main > .lg\:hidden {
+    background: rgba(20, 35, 32, 0.88);
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+html.dark .app-sidebar nav a:hover {
+    background-color: rgba(94, 235, 208, 0.08) !important;
+    color: #5eebd0 !important;
+}
+
+html.dark .app-sidebar nav a:hover .w-10 {
+    background-color: rgba(94, 235, 208, 0.14) !important;
+}
+
+html.dark .hero-panel.about-panel {
+    color: var(--dark-text-strong);
+    border-color: rgba(255, 255, 255, 0.08);
+    background:
+        radial-gradient(30rem 30rem at 100% 0%, rgba(15, 118, 110, 0.16), transparent 60%),
+        radial-gradient(26rem 26rem at -10% 110%, rgba(53, 107, 140, 0.14), transparent 60%),
+        linear-gradient(180deg, rgba(20, 35, 32, 0.92), rgba(20, 35, 32, 0.85));
+}
+
+html.dark .hero-panel.about-panel b {
+    color: #5eebd0;
+}
+
+/* Card / neutral surfaces */
+html.dark .bg-white,
+html.dark .surface-card {
+    background-color: var(--dark-bg-1) !important;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-slate-100,
+html.dark .bg-slate-200 {
+    background-color: var(--dark-bg-2) !important;
+}
+
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-300,
+html.dark .divide-slate-100 {
+    border-color: var(--dark-border) !important;
+}
+
+html.dark .text-slate-400,
+html.dark .text-slate-500 {
+    color: var(--dark-text-muted) !important;
+}
+
+html.dark .text-slate-600,
+html.dark .text-slate-700 {
+    color: var(--dark-text) !important;
+}
+
+html.dark .text-slate-800,
+html.dark .text-slate-900 {
+    color: var(--dark-text-strong) !important;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea {
+    background-color: var(--dark-bg-2);
+    color: var(--dark-text-strong);
+    border-color: var(--dark-border);
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+    color: var(--dark-text-muted);
+}
+
+/* Teal (brand / "indigo") tinted chips */
+html.dark .bg-indigo-50,
+html.dark .bg-indigo-100 {
+    background-color: rgba(15, 118, 110, 0.22) !important;
+}
+
+html.dark .text-indigo-400 {
+    color: #7fd9c4 !important;
+}
+
+html.dark .text-indigo-600,
+html.dark .text-indigo-700 {
+    color: #5eebd0 !important;
+}
+
+html.dark .border-indigo-100 {
+    border-color: rgba(15, 118, 110, 0.4) !important;
+}
+
+html.dark .ring-indigo-100,
+html.dark .ring-indigo-200 {
+    --tw-ring-color: rgba(15, 118, 110, 0.35) !important;
+}
+
+/* Slate-blue ("blue") tinted chips */
+html.dark .bg-blue-50,
+html.dark .bg-blue-100 {
+    background-color: rgba(53, 107, 140, 0.28) !important;
+}
+
+html.dark .text-blue-400 {
+    color: #9cc7e0 !important;
+}
+
+html.dark .text-blue-600,
+html.dark .text-blue-700 {
+    color: #7fb8da !important;
+}
+
+html.dark .border-blue-100 {
+    border-color: rgba(53, 107, 140, 0.4) !important;
+}
+
+/* Amber (warning / stunting risk) */
+html.dark .bg-amber-50,
+html.dark .bg-amber-100 {
+    background-color: rgba(217, 119, 6, 0.2) !important;
+}
+
+html.dark .text-amber-400,
+html.dark .text-amber-500 {
+    color: #fcd34d !important;
+}
+
+html.dark .text-amber-600,
+html.dark .text-amber-700,
+html.dark .text-amber-900 {
+    color: #fbbf24 !important;
+}
+
+html.dark .border-amber-100,
+html.dark .border-amber-200 {
+    border-color: rgba(217, 119, 6, 0.4) !important;
+}
+
+/* Emerald (success / normal) */
+html.dark .bg-emerald-50,
+html.dark .bg-emerald-100 {
+    background-color: rgba(5, 150, 105, 0.2) !important;
+}
+
+html.dark .text-emerald-500 {
+    color: #6ee7b7 !important;
+}
+
+html.dark .text-emerald-600,
+html.dark .text-emerald-700,
+html.dark .text-emerald-900 {
+    color: #34d399 !important;
+}
+
+html.dark .border-emerald-100,
+html.dark .border-emerald-200 {
+    border-color: rgba(5, 150, 105, 0.4) !important;
+}
+
+/* Red (destructive / error) */
+html.dark .bg-red-50,
+html.dark .bg-red-100 {
+    background-color: rgba(220, 38, 38, 0.2) !important;
+}
+
+html.dark .text-red-500,
+html.dark .text-red-600,
+html.dark .text-red-700 {
+    color: #f87171 !important;
+}
+
+html.dark .border-red-100 {
+    border-color: rgba(220, 38, 38, 0.4) !important;
+}
+
+html.dark .border-red-500 {
+    border-color: #f87171 !important;
+}
+
+html.dark .ring-red-100 {
+    --tw-ring-color: rgba(220, 38, 38, 0.35) !important;
+}
+
+/* Theme toggle button: swap sun/moon icon based on current mode */
+.theme-toggle-btn .theme-icon-sun {
+    display: none;
+}
+
+html.dark .theme-toggle-btn .theme-icon-moon {
+    display: none;
+}
+
+html.dark .theme-toggle-btn .theme-icon-sun {
+    display: inline-block;
+}
